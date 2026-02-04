@@ -40,7 +40,8 @@ export const useTimerStore = defineStore('timer', {
       return state.sessions.filter(session => session.date === today)
     },
     todayTotalTime: (state) => {
-      return state.todaySessions.reduce((total, session) => total + session.duration, 0)
+      const today = new Date().toISOString().split('T')[0]
+      return state.sessions.filter(session => session.date === today).reduce((total: number, session: StudySession) => total + session.duration, 0)
     }
   },
   actions: {
@@ -54,7 +55,7 @@ export const useTimerStore = defineStore('timer', {
           endTime: null,
           duration: 0,
           content: '',
-          date: this.startTime.toISOString().split('T')[0],
+          date: this.startTime.toISOString().split('T')[0] as string,
           subject: this.selectedSubject || '未分类'
         }
       }
