@@ -1,0 +1,74 @@
+# 学习会话测试数据
+test_cases:
+  - name: 创建学习会话
+    data:
+      subject: 编程
+      content: 学习了Python基础
+      duration: 3600
+      start_time: "2024-01-01T09:00:00"
+      end_time: "2024-01-01T10:00:00"
+      session_date: "2024-01-01"
+    expected:
+      status_code: 201
+      has_id: true
+    description: 创建正常的学习会话
+    tags: [smoke, positive, study_session]
+
+  - name: 创建无主题会话
+    data:
+      subject: ""
+      content: 学习内容
+      duration: 1800
+    expected:
+      status_code: 400
+    description: 创建没有主题的学习会话
+    tags: [negative, study_session]
+
+  - name: 创建超时会话
+    data:
+      subject: 数学
+      content: 学习了微积分
+      duration: 86400
+      start_time: "2024-01-01T00:00:00"
+      end_time: "2024-01-02T00:00:00"
+    expected:
+      status_code: 201
+    description: 创建24小时的学习会话
+    tags: [positive, study_session]
+
+  - name: 更新学习会话
+    data:
+      id: existing-session-id
+      subject: 编程
+      content: 更新了学习内容
+      duration: 7200
+    expected:
+      status_code: 200
+    description: 更新已有的学习会话
+    tags: [positive, study_session]
+
+  - name: 删除学习会话
+    data:
+      id: session-to-delete
+    expected:
+      status_code: 204
+    description: 删除学习会话
+    tags: [positive, study_session]
+
+  - name: 获取所有会话
+    data:
+      order: start_time.desc
+    expected:
+      status_code: 200
+      is_list: true
+    description: 获取所有学习会话列表
+    tags: [smoke, positive, study_session]
+
+  - name: 按日期筛选会话
+    data:
+      session_date: "2024-01-01"
+    expected:
+      status_code: 200
+      is_list: true
+    description: 按日期筛选学习会话
+    tags: [positive, study_session]

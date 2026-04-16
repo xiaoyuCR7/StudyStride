@@ -1,0 +1,59 @@
+# 认证测试数据
+test_cases:
+  - name: 正常登录
+    data:
+      email: 1178327328@qq.com
+      password: "12345678"
+    expected:
+      status_code: 200
+      has_token: true
+    description: 使用正确的邮箱和密码登录
+    tags: [smoke, positive, auth]
+
+  - name: 错误密码登录
+    data:
+      email: 1178327328@qq.com
+      password: WrongPassword
+    expected:
+      status_code: 400
+      error_message: "Invalid login credentials"
+    description: 使用错误的密码登录
+    tags: [negative, auth]
+
+  - name: 不存在的用户登录
+    data:
+      email: nonexistent@example.com
+      password: Test123456
+    expected:
+      status_code: 400
+      error_message: "Invalid login credentials"
+    description: 使用不存在的邮箱登录
+    tags: [negative, auth]
+
+  - name: 空邮箱登录
+    data:
+      email: ""
+      password: Test123456
+    expected:
+      status_code: 400
+    description: 使用空邮箱登录
+    tags: [negative, auth]
+
+  - name: 空密码登录
+    data:
+      email: test@example.com
+      password: ""
+    expected:
+      status_code: 400
+    description: 使用空密码登录
+    tags: [negative, auth]
+
+  - name: 重复注册
+    data:
+      email: 1178327328@qq.com
+      password: "12345678"
+    expected:
+      status_code: 422
+      error_message: "User already registered"
+    description: 使用已存在的邮箱注册
+    tags: [negative, auth]

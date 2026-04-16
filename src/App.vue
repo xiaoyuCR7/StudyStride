@@ -8,6 +8,11 @@
         <router-link to="/" class="navbar-item">首页</router-link>
         <router-link to="/history" class="navbar-item">历史记录</router-link>
         <router-link to="/settings" class="navbar-item">设置</router-link>
+        <router-link v-if="!auth.isLoggedIn" to="/login" class="navbar-item">登录</router-link>
+        <span v-else class="navbar-user">
+          <span class="navbar-email">{{ auth.user?.email }}</span>
+          <button type="button" class="logout-btn" @click="logout">退出</button>
+        </span>
       </div>
     </nav>
     <main class="main-content">
@@ -20,7 +25,13 @@
 </template>
 
 <script setup lang="ts">
-// App component
+import { useAuthStore } from './stores/auth'
+
+const auth = useAuthStore()
+
+const logout = async () => {
+  await auth.signOut()
+}
 </script>
 
 <style>
@@ -73,6 +84,36 @@ body {
 
 .navbar-item:hover {
   color: #4CAF50;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.navbar-email {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.logout-btn:hover {
+  border-color: #4caf50;
+  color: #4caf50;
 }
 
 .main-content {

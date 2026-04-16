@@ -157,7 +157,7 @@ const recordQuickStudy = () => {
   // 创建快速学习会话
   const now = new Date()
   const session = {
-    id: Date.now().toString(),
+    id: store.newId(),
     startTime: new Date(now.getTime() - totalSeconds * 1000), // 计算开始时间
     endTime: now,
     duration: totalSeconds,
@@ -168,7 +168,7 @@ const recordQuickStudy = () => {
   
   // 添加到状态管理
   store.sessions.push(session)
-  store.saveSessions()
+  void store.saveSessions()
   
   // 重置表单
   quickRecordSubject.value = ''
@@ -210,9 +210,9 @@ const resumeTimer = () => {
   startUpdateInterval()
 }
 
-const stopTimer = () => {
+const stopTimer = async () => {
   store.saveSessionContent(sessionContent.value)
-  store.stopTimer()
+  await store.stopTimer()
   isPaused.value = false
   sessionContent.value = ''
   if (updateInterval) {
@@ -243,10 +243,8 @@ const formatDuration = (seconds: number) => {
   return `${hours}小时${minutes}分钟`
 }
 
-onMounted(() => {
-  store.loadSessions()
-  store.loadSettings()
-  store.loadSubjects()
+onMounted(async () => {
+  await Promise.all([store.loadSessions(), store.loadSettings(), store.loadSubjects()])
 })
 
 onUnmounted(() => {

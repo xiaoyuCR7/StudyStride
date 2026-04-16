@@ -216,8 +216,8 @@ const showAll = () => {
   filterSessions()
 }
 
-const formatTime = (time: string) => {
-  const date = new Date(time)
+const formatTime = (time: Date | string) => {
+  const date = time instanceof Date ? time : new Date(time)
   return date.toLocaleTimeString('zh-CN', {
     hour: '2-digit',
     minute: '2-digit'
@@ -237,10 +237,10 @@ const showDeleteConfirmModal = (id: string) => {
 }
 
 // 确认删除会话
-const confirmDeleteSession = () => {
+const confirmDeleteSession = async () => {
   if (deleteSessionId.value) {
     store.sessions = store.sessions.filter(session => session.id !== deleteSessionId.value)
-    store.saveSessions()
+    await store.saveSessions()
     filterSessions()
     showToastMessage('学习记录已删除')
     cancelDeleteSession()
@@ -270,7 +270,7 @@ const editSession = (session: any) => {
 }
 
 // 保存编辑后的会话
-const saveEditedSession = () => {
+const saveEditedSession = async () => {
   const totalSeconds = editHours.value * 3600 + editMinutes.value * 60
   
   if (totalSeconds === 0) {
@@ -297,7 +297,7 @@ const saveEditedSession = () => {
         date: (session.date || startTime.toISOString().split('T')[0]) as string
       }
       
-      store.saveSessions()
+      await store.saveSessions()
       filterSessions()
       cancelEditSession()
       showToastMessage('学习记录已更新成功')
@@ -329,9 +329,8 @@ const showToastMessage = (message: string) => {
   }, 2000)
 }
 
-onMounted(() => {
-  store.loadSessions()
-  store.loadSubjects()
+onMounted(async () => {
+  await Promise.all([store.loadSessions(), store.loadSubjects()])
   filterSessions()
 })
 </script>

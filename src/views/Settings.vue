@@ -130,6 +130,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useTimerStore } from '../stores/timer'
+import { normalizeSession } from '../services/studyData'
 
 const store = useTimerStore()
 const reminderInterval = ref(60)
@@ -150,8 +151,8 @@ const deleteSubjectName = ref('')
 
 const subjects = computed(() => store.subjects)
 
-const saveSettings = () => {
-  store.setReminderInterval(reminderInterval.value)
+const saveSettings = async () => {
+  await store.setReminderInterval(reminderInterval.value)
   showToastMessage('设置已保存')
 }
 
@@ -219,9 +220,8 @@ const showClearDataConfirmModal = () => {
   showClearDataModal.value = true
 }
 
-const confirmClearData = () => {
-  localStorage.removeItem('studySessions')
-  store.sessions = []
+const confirmClearData = async () => {
+  await store.clearAllSessions()
   showToastMessage('数据已清除')
   cancelClearData()
 }
@@ -249,41 +249,33 @@ const importData = () => {
   fileInput.value?.click()
 }
 
-const handleFileImport = (event: any) => {
-  const file = event.target.files[0]
+const handleFileImport = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
   if (!file) return
-  
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target?.result as string)
-      if (Array.isArray(data)) {
-        // 验证数据格式
-        const isValid = data.every(item => {
-          return item.id && item.startTime && item.endTime && item.duration && item.date
-        })
-        
-        if (isValid) {
-          // 使用自定义弹窗确认
-          if (confirm('确定要导入数据吗？这将覆盖当前的学习记录。')) {
-            store.sessions = data
-            store.saveSessions()
-            showToastMessage('数据导入成功！')
-          }
-        } else {
-          showToastMessage('无效的数据文件格式')
-        }
-      } else {
-        showToastMessage('无效的数据文件格式')
-      }
-    } catch (error) {
-      showToastMessage('数据文件解析失败')
+  try {
+    const text = await file.text()
+    const data = JSON.parse(text) as unknown[]
+    if (!Array.isArray(data)) {
+      showToastMessage('无效的数据文件格式')
+      return
     }
+    const isValid = data.every((item) => {
+      const o = item as Record<string, unknown>
+      return o.id && o.startTime && o.endTime && o.duration && o.date
+    })
+    if (!isValid) {
+      showToastMessage('无效的数据文件格式')
+      return
+    }
+    if (!confirm('确定要导入数据吗？这将覆盖当前的学习记录。')) return
+    store.sessions = data.map((item) => normalizeSession(item as Record<string, unknown>))
+    await store.saveSessions()
+    showToastMessage('数据导入成功！')
+  } catch {
+    showToastMessage('数据文件解析失败')
   }
-  reader.readAsText(file)
-  
-  // 重置文件输入，以便可以再次选择同一个文件
-  event.target.value = ''
+  target.value = ''
 }
 
 // 显示提示消息
@@ -297,9 +289,8 @@ const showToastMessage = (message: string) => {
   }, 2000)
 }
 
-onMounted(() => {
-  store.loadSettings()
-  store.loadSubjects()
+onMounted(async () => {
+  await Promise.all([store.loadSettings(), store.loadSubjects()])
   reminderInterval.value = store.reminderInterval
   if ('Notification' in window) {
     notificationPermission.value = Notification.permission

@@ -1,0 +1,157 @@
+openapi: 3.1.0
+info:
+  title: StudyStride API
+  description: StudyStride 项目的 API 接口定义
+  version: 1.0.0
+servers:
+  - url: https://your-supabase-project.supabase.co
+    description: Supabase 项目 API 端点
+paths:
+  /api/sessions:
+    get:
+      summary: 获取学习会话列表
+      description: 获取当前用户的所有学习会话
+      responses:
+        '200':
+          description: 成功获取学习会话列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudySession'
+    post:
+      summary: 替换所有学习会话
+      description: 替换当前用户的所有学习会话
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/StudySession'
+      responses:
+        '200':
+          description: 成功替换学习会话
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudySession'
+  /api/subjects:
+    get:
+      summary: 获取科目列表
+      description: 获取当前用户的所有科目
+      responses:
+        '200':
+          description: 成功获取科目列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subject'
+    post:
+      summary: 替换所有科目
+      description: 替换当前用户的所有科目
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Subject'
+      responses:
+        '200':
+          description: 成功替换科目
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subject'
+  /api/settings:
+    get:
+      summary: 获取用户设置
+      description: 获取当前用户的设置
+      responses:
+        '200':
+          description: 成功获取用户设置
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettings'
+    put:
+      summary: 更新用户设置
+      description: 更新当前用户的设置
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSettings'
+      responses:
+        '200':
+          description: 成功更新用户设置
+  /api/auth/session:
+    get:
+      summary: 获取远程会话状态
+      description: 获取当前用户的远程会话状态
+      responses:
+        '200':
+          description: 成功获取远程会话状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated: 
+                    type: boolean
+components:
+  schemas:
+    StudySession:
+      type: object
+      properties:
+        id: 
+          type: string
+        startTime: 
+          type: string
+          format: date-time
+        endTime: 
+          type: string
+          format: date-time
+          nullable: true
+        duration: 
+          type: integer
+        content: 
+          type: string
+        date: 
+          type: string
+          format: date
+        subject: 
+          type: string
+      required: [id, startTime, duration, content, date, subject]
+    Subject:
+      type: object
+      properties:
+        id: 
+          type: string
+        name: 
+          type: string
+      required: [id, name]
+    UserSettings:
+      type: object
+      properties:
+        reminder_interval: 
+          type: integer
+      required: [reminder_interval]
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []

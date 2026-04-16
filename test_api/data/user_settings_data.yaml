@@ -1,0 +1,65 @@
+# 用户设置测试数据
+test_cases:
+  - name: 获取用户设置
+    data: {}
+    expected:
+      status_code: 200
+      has_reminder_interval: true
+    description: 获取当前用户设置
+    tags: [smoke, positive, user_settings]
+
+  - name: 更新提醒间隔
+    data:
+      reminder_interval: 30
+    expected:
+      status_code: 200
+    description: 更新提醒间隔为30分钟
+    tags: [smoke, positive, user_settings]
+
+  - name: 设置最小提醒间隔
+    data:
+      reminder_interval: 5
+    expected:
+      status_code: 200
+    description: 设置最小提醒间隔为5分钟
+    tags: [positive, user_settings]
+
+  - name: 设置最大提醒间隔
+    data:
+      reminder_interval: 180
+    expected:
+      status_code: 200
+    description: 设置最大提醒间隔为180分钟
+    tags: [positive, user_settings]
+
+  - name: 设置无效提醒间隔_负数
+    data:
+      reminder_interval: -1
+    expected:
+      status_code: 400
+    description: 设置负数提醒间隔
+    tags: [negative, user_settings]
+
+  - name: 设置无效提醒间隔_过大
+    data:
+      reminder_interval: 1000
+    expected:
+      status_code: 400
+    description: 设置过大的提醒间隔
+    tags: [negative, user_settings]
+
+  - name: 设置零提醒间隔
+    data:
+      reminder_interval: 0
+    expected:
+      status_code: 400
+    description: 设置提醒间隔为0
+    tags: [negative, user_settings]
+
+  - name: 首次创建设置
+    data:
+      reminder_interval: 45
+    expected:
+      status_code: 201
+    description: 首次创建用户设置
+    tags: [positive, user_settings]

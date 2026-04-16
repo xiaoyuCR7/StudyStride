@@ -1,19 +1,9 @@
 import { defineStore } from 'pinia'
+import { supabase } from '../lib/supabase'
+import * as studyData from '../services/studyData'
+import type { StudySession, Subject } from '../types/study'
 
-interface StudySession {
-  id: string
-  startTime: Date
-  endTime: Date | null
-  duration: number
-  content: string
-  date: string
-  subject: string
-}
-
-interface Subject {
-  id: string
-  name: string
-}
+export type { StudySession, Subject }
 
 export const useTimerStore = defineStore('timer', {
   state: () => ({
@@ -24,7 +14,7 @@ export const useTimerStore = defineStore('timer', {
     sessions: [] as StudySession[],
     subjects: [] as Subject[],
     selectedSubject: '',
-    reminderInterval: 60, // 默认 60 分钟
+    reminderInterval: 60,
     lastReminderTime: 0
   }),
   getters: {
@@ -37,20 +27,30 @@ export const useTimerStore = defineStore('timer', {
     },
     todaySessions: (state) => {
       const today = new Date().toISOString().split('T')[0]
-      return state.sessions.filter(session => session.date === today)
+      return state.sessions.filter((session) => session.date === today)
     },
     todayTotalTime: (state) => {
       const today = new Date().toISOString().split('T')[0]
-      return state.sessions.filter(session => session.date === today).reduce((total: number, session: StudySession) => total + session.duration, 0)
+      return state.sessions
+        .filter((session) => session.date === today)
+        .reduce((total: number, session: StudySession) => total + session.duration, 0)
     }
   },
   actions: {
+    newId() {
+      return crypto.randomUUID()
+    },
+
+    async loadAll() {
+      await Promise.all([this.loadSessions(), this.loadSubjects(), this.loadSettings()])
+    },
+
     startTimer() {
       if (!this.isRunning) {
         this.isRunning = true
         this.startTime = new Date()
         this.currentSession = {
-          id: Date.now().toString(),
+          id: this.newId(),
           startTime: this.startTime,
           endTime: null,
           duration: 0,
@@ -60,33 +60,40 @@ export const useTimerStore = defineStore('timer', {
         }
       }
     },
-    
-    // 科目管理方法
+
     addSubject(name: string) {
+      // 验证科目名称不能为空
+      const trimmedName = name.trim()
+      if (!trimmedName) {
+        console.warn('科目名称不能为空')
+        return
+      }
+      
       const newSubject: Subject = {
-        id: Date.now().toString(),
-        name
+        id: this.newId(),
+        name: trimmedName
       }
       this.subjects.push(newSubject)
-      this.saveSubjects()
+      void this.saveSubjects()
     },
-    
+
     removeSubject(id: string) {
-      this.subjects = this.subjects.filter(subject => subject.id !== id)
-      this.saveSubjects()
+      this.subjects = this.subjects.filter((subject) => subject.id !== id)
+      void this.saveSubjects()
     },
-    
+
     updateSubject(id: string, name: string) {
-      const subject = this.subjects.find(subject => subject.id === id)
+      const subject = this.subjects.find((s) => s.id === id)
       if (subject) {
         subject.name = name
-        this.saveSubjects()
+        void this.saveSubjects()
       }
     },
-    
+
     setSelectedSubject(subject: string) {
       this.selectedSubject = subject
     },
+
     pauseTimer() {
       if (this.isRunning) {
         this.isRunning = false
@@ -97,36 +104,43 @@ export const useTimerStore = defineStore('timer', {
         }
       }
     },
-    stopTimer() {
+
+    async stopTimer() {
       this.pauseTimer()
       if (this.currentSession) {
         this.currentSession.endTime = new Date()
         this.currentSession.duration = this.elapsedTime
         this.sessions.push({ ...this.currentSession })
-        this.saveSessions()
+        await this.saveSessions()
         this.resetTimer()
       }
     },
+
     resetTimer() {
       this.isRunning = false
       this.startTime = null
       this.elapsedTime = 0
       this.currentSession = null
     },
+
     updateElapsedTime() {
       if (this.isRunning && this.startTime) {
         const now = new Date()
         const totalElapsedSeconds = Math.floor((now.getTime() - this.startTime.getTime()) / 1000)
         this.elapsedTime = totalElapsedSeconds
-        
-        // 检查是否需要提醒休息
+
         const totalMinutes = Math.floor(this.elapsedTime / 60)
-        if (totalMinutes > 0 && totalMinutes % this.reminderInterval === 0 && totalMinutes !== this.lastReminderTime) {
+        if (
+          totalMinutes > 0 &&
+          totalMinutes % this.reminderInterval === 0 &&
+          totalMinutes !== this.lastReminderTime
+        ) {
           this.lastReminderTime = totalMinutes
           this.sendReminder()
         }
       }
     },
+
     sendReminder() {
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('休息提醒', {
@@ -135,45 +149,106 @@ export const useTimerStore = defineStore('timer', {
         })
       }
     },
+
     saveSessionContent(content: string) {
       if (this.currentSession) {
         this.currentSession.content = content
       }
     },
-    saveSessions() {
+
+    async saveSessions() {
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        this.sessions = await studyData.replaceAllSessions(this.sessions)
+        return
+      }
       localStorage.setItem('studySessions', JSON.stringify(this.sessions))
     },
-    loadSessions() {
+
+    async loadSessions() {
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        try {
+          this.sessions = await studyData.fetchSessions()
+        } catch {
+          this.sessions = []
+        }
+        return
+      }
       const saved = localStorage.getItem('studySessions')
       if (saved) {
-        this.sessions = JSON.parse(saved)
+        const parsed = JSON.parse(saved) as Record<string, unknown>[]
+        this.sessions = parsed.map((row) => studyData.normalizeSession(row))
       }
     },
-    setReminderInterval(interval: number) {
+
+    async setReminderInterval(interval: number) {
       this.reminderInterval = interval
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        await studyData.upsertUserSettings(interval)
+        return
+      }
       localStorage.setItem('reminderInterval', interval.toString())
     },
-    loadSettings() {
+
+    async loadSettings() {
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        try {
+          const row = await studyData.fetchUserSettings()
+          if (row) {
+            this.reminderInterval = row.reminder_interval
+          }
+        } catch {
+          /* keep default */
+        }
+        return
+      }
       const savedInterval = localStorage.getItem('reminderInterval')
       if (savedInterval) {
-        this.reminderInterval = parseInt(savedInterval)
+        this.reminderInterval = parseInt(savedInterval, 10)
       }
     },
-    
-    // 科目数据持久化
-    saveSubjects() {
+
+    async saveSubjects() {
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        this.subjects = await studyData.replaceAllSubjects(this.subjects)
+        return
+      }
       localStorage.setItem('studySubjects', JSON.stringify(this.subjects))
     },
-    
-    loadSubjects() {
+
+    async loadSubjects() {
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        try {
+          this.subjects = await studyData.fetchSubjects()
+        } catch {
+          this.subjects = []
+        }
+        return
+      }
       const saved = localStorage.getItem('studySubjects')
       if (saved) {
         this.subjects = JSON.parse(saved)
       } else {
-        // 初始为空，用户需要自己添加科目
         this.subjects = []
-        this.saveSubjects()
+        localStorage.setItem('studySubjects', JSON.stringify(this.subjects))
       }
+    },
+
+    async clearAllSessions() {
+      const remote = await studyData.getRemoteSession()
+      if (remote) {
+        const userId = (await supabase.auth.getUser()).data.user?.id
+        if (userId) {
+          await supabase.from('study_sessions').delete().eq('user_id', userId)
+        }
+      }
+      this.sessions = []
+      localStorage.removeItem('studySessions')
     }
   }
 })

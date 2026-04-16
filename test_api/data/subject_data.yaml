@@ -1,0 +1,72 @@
+# 科目测试数据
+test_cases:
+  - name: 创建科目
+    data:
+      name: 编程
+    expected:
+      status_code: 201
+      has_id: true
+    description: 创建新科目
+    tags: [smoke, positive, subject]
+
+  - name: 创建重复科目
+    data:
+      name: 编程
+    expected:
+      status_code: 409
+      error_message: "Duplicate entry"
+    description: 创建已存在的科目
+    tags: [negative, subject]
+
+  - name: 创建空名称科目
+    data:
+      name: ""
+    expected:
+      status_code: 400
+    description: 创建名称为空的科目
+    tags: [negative, subject]
+
+  - name: 创建长名称科目
+    data:
+      name: "这是一个非常长的科目名称超过了最大长度限制"
+    expected:
+      status_code: 400
+    description: 创建超长名称的科目
+    tags: [negative, subject]
+
+  - name: 获取所有科目
+    data:
+      order: created_at.asc
+    expected:
+      status_code: 200
+      is_list: true
+    description: 获取所有科目列表
+    tags: [smoke, positive, subject]
+
+  - name: 更新科目
+    data:
+      id: existing-subject-id
+      name: 编程开发
+    expected:
+      status_code: 200
+    description: 更新科目名称
+    tags: [positive, subject]
+
+  - name: 删除科目
+    data:
+      id: subject-to-delete
+    expected:
+      status_code: 204
+    description: 删除科目
+    tags: [positive, subject]
+
+  - name: 批量创建科目
+    data:
+      subjects:
+        - name: 数学
+        - name: 英语
+        - name: 物理
+    expected:
+      status_code: 201
+    description: 批量创建科目
+    tags: [positive, subject]
