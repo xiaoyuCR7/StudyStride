@@ -3,7 +3,7 @@
     <nav class="navbar">
       <div class="navbar-brand">
         <router-link to="/" class="brand-link">
-          <img src="../assets/logo.png" alt="StudyStride" class="brand-logo" />
+          <img :src="logo" alt="StudyStride" class="brand-logo" />
           <span class="brand-name">StudyStride</span>
         </router-link>
       </div>
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from './stores/auth'
+import logo from './assets/logo.png'
 
 const auth = useAuthStore()
 
