@@ -68,6 +68,10 @@ jobs:
       run: |
         cd test_web
         pip install -r requirements.txt
+    - name: Install Playwright browsers
+      run: |
+        cd test_web
+        playwright install chromium
     - name: Start development server
       run: |
         npm ci
