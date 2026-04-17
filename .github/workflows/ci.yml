@@ -89,6 +89,8 @@ jobs:
     needs: [frontend-build, api-test, web-test]
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # 确保获取完整的 Git 历史
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
@@ -102,3 +104,6 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
+        force_orphan: true  # 强制创建新的孤儿分支
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
