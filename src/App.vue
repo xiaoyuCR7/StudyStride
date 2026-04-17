@@ -2,7 +2,10 @@
   <div class="app">
     <nav class="navbar">
       <div class="navbar-brand">
-        <router-link to="/">StudyStride</router-link>
+        <router-link to="/" class="brand-link">
+          <img src="/logo.png" alt="StudyStride" class="brand-logo" />
+          <span class="brand-name">StudyStride</span>
+        </router-link>
       </div>
       <div class="navbar-menu">
         <router-link to="/" class="navbar-item">首页</router-link>
@@ -74,20 +77,32 @@ body {
   box-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
 }
 
-.navbar-brand a {
+.navbar-brand .brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   color: white;
   text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand .brand-link:hover {
+  transform: scale(1.05);
+}
+
+.navbar-brand .brand-logo {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+}
+
+.navbar-brand .brand-name {
   font-size: 1.5rem;
   font-weight: bold;
   background: linear-gradient(45deg, #d500f9, #9c27b0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: all 0.3s ease;
-}
-
-.navbar-brand a:hover {
-  transform: scale(1.05);
 }
 
 .navbar-menu {
