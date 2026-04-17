@@ -3,7 +3,7 @@
     <nav class="navbar">
       <div class="navbar-brand">
         <router-link to="/" class="brand-link">
-          <img src="/logo.png" alt="StudyStride" class="brand-logo" />
+          <img src="../assets/logo.png" alt="StudyStride" class="brand-logo" />
           <span class="brand-name">StudyStride</span>
         </router-link>
       </div>
