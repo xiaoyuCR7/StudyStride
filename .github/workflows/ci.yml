@@ -82,16 +82,18 @@ jobs:
         cd test_web
         pytest
 
-  # 部署（可选）
-  deploy:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [frontend-build, api-test, web-test]
-    permissions:
-      contents: write
-      pages: write
-      id-token: write
-    steps:
+ deploy:
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  needs: [frontend-build, api-test, web-test]
+  environment:
+    name: github-pages
+    url: ${{ steps.deployment.outputs.page_url }}
+  permissions:
+    contents: write
+    pages: write
+    id-token: write
+  steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
