@@ -33,6 +33,23 @@ class HistoryPage(BasePage):
         # 提示消息
         self.toast_message = ".modal"
     
+    def wait_for_load(self):
+        """等待页面加载完成"""
+        super().wait_for_load()
+        # 等待会话项加载完成
+        import time
+        time.sleep(1)
+        
+    def wait_for_sessions(self, timeout: int = 10):
+        """等待会话项出现"""
+        import time
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if self.get_session_count() > 0:
+                return
+            time.sleep(0.5)
+        # 如果超时，仍然继续执行，不抛出异常
+    
     def filter_by_date(self, date: str):
         """按日期筛选"""
         self.fill(self.date_filter, date)

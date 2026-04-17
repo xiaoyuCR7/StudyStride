@@ -68,11 +68,22 @@ class HomePage(BasePage):
     
     def quick_record_session(self, subject: str, hours: str, minutes: str, content: str = ""):
         """快速记录学习会话"""
-        self.add_subject(subject)
+        # 切换到快速记录标签
         self.switch_to_quick_record()
+        # 先添加科目
+        self.add_subject(subject)
+        # 等待科目选项加载
+        import time
+        time.sleep(0.5)
+        # 选择科目
         self.select_option(self.quick_subject_select, subject)
+        # 填写时长
         self.fill(self.quick_hours_input, hours)
         self.fill(self.quick_minutes_input, minutes)
+        # 填写内容
         if content:
             self.fill(self.quick_content_input, content)
+        # 点击记录按钮
         self.click(self.quick_record_button)
+        # 等待保存完成
+        time.sleep(1)

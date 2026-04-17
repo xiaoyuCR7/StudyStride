@@ -24,6 +24,8 @@ class TestHistoryManagement:
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 检查是否有记录
         assert history_page.get_session_count() > 0
@@ -43,6 +45,8 @@ class TestHistoryManagement:
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 编辑第一条记录
         history_page.edit_session(0)
@@ -66,6 +70,8 @@ class TestHistoryManagement:
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 检查记录数量
         initial_count = history_page.get_session_count()
@@ -96,6 +102,8 @@ class TestHistoryManagement:
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 按日期筛选
         history_page.filter_by_date(today)
