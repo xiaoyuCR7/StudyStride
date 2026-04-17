@@ -17,9 +17,15 @@ class TestHistoryManagement:
         test_subject = "未分类"
         home_page.quick_record_session(test_subject, "1", "30", "测试快速记录功能")
         
+        # 等待会话保存完成
+        import time
+        time.sleep(2)
+        
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 检查是否有记录
         assert history_page.get_session_count() > 0
@@ -32,9 +38,15 @@ class TestHistoryManagement:
         # 先创建一条记录
         home_page.quick_record_session("未分类", "0", "30", "测试历史记录管理")
         
+        # 等待会话保存完成
+        import time
+        time.sleep(2)
+        
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 编辑第一条记录
         history_page.edit_session(0)
@@ -51,9 +63,15 @@ class TestHistoryManagement:
         # 先创建一条记录
         home_page.quick_record_session("未分类", "0", "30", "测试删除功能")
         
+        # 等待会话保存完成
+        import time
+        time.sleep(2)
+        
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 检查记录数量
         initial_count = history_page.get_session_count()
@@ -77,9 +95,15 @@ class TestHistoryManagement:
         today = datetime.now().strftime("%Y-%m-%d")
         home_page.quick_record_session("未分类", "0", "10", "今天的记录")
         
+        # 等待会话保存完成
+        import time
+        time.sleep(2)
+        
         # 导航到历史记录页面
         page.click("a:has-text('历史记录')")
         history_page.wait_for_load()
+        # 等待会话项出现
+        history_page.wait_for_sessions()
         
         # 按日期筛选
         history_page.filter_by_date(today)
