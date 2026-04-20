@@ -12,6 +12,7 @@ from core.response_handler import ResponseHandler
 from utils.data_provider import DataProvider, TestData
 from utils.allure_helper import allure_feature, allure_story, allure_severity, allure_tag
 from utils.retry_helper import retry_on_failure
+from utils.faker_helper import faker_helper
 
 
 @allure_feature("认证管理")
@@ -25,11 +26,35 @@ class TestAuth:
         cls.api_client = ApiClient()
         cls.auth_manager = AuthManager(cls.api_client)
         cls.data_provider = DataProvider()
+        # 生成测试账号
+        cls.test_email = faker_helper.generate_email(prefix='test')
+        cls.test_password = faker_helper.generate_password()
+        cls.test_name = faker_helper.generate_name()
     
     @classmethod
     def teardown_class(cls):
         """测试类清理"""
         cls.api_client.close()
+    
+    @allure_severity("critical")
+    @allure_tag("smoke", "positive")
+    @pytest.mark.smoke
+    @pytest.mark.positive
+    @pytest.mark.auth
+    def test_signup(self):
+        """测试用户注册"""
+        with allure.step(f"使用邮箱 {self.test_email} 注册"):
+            response = self.auth_manager.signup(
+                email=self.test_email,
+                password=self.test_password,
+                user_metadata={"name": self.test_name}
+            )
+        
+        with allure.step("验证响应"):
+            handler = ResponseHandler(response)
+            # 注册可能成功或失败（如果用户已存在）
+            if response.is_success:
+                handler.assert_success()
     
     @allure_severity("blocker")
     @allure_tag("smoke", "positive")
@@ -39,12 +64,8 @@ class TestAuth:
     @retry_on_failure(max_retries=2)
     def test_login_success(self):
         """测试正常登录"""
-        with allure.step("准备测试数据"):
-            email = "1178327328@qq.com"
-            password = "12345678"
-        
-        with allure.step("执行登录请求"):
-            response = self.auth_manager.login(email, password)
+        with allure.step(f"使用邮箱 {self.test_email} 和密码 {self.test_password} 登录"):
+            response = self.auth_manager.login(self.test_email, self.test_password)
         
         with allure.step("验证响应"):
             handler = ResponseHandler(response)
@@ -62,61 +83,16 @@ class TestAuth:
                     allure.attachment_type.TEXT
                 )
     
-    @allure_severity("critical")
-    @allure_tag("negative")
-    @pytest.mark.negative
-    @pytest.mark.auth
-    @pytest.mark.parametrize(
-        "email,password,expected_status",
-        [
-            ("117832732@qq.com", "WrongPass", 400),
-            ("1178327328@qq.com", "", 400),
-            ("", "12345678", 400),
-            ("1178327328qq.com", "12345678", 400),
-        ],
-        ids=["错误凭证", "空密码", "空邮箱", "无效邮箱格式"]
-    )
-    def test_login_failure(self, email, password, expected_status):
-        """测试登录失败场景"""
-        with allure.step(f"使用邮箱 {email} 和密码 {password} 登录"):
-            response = self.auth_manager.login(email, password)
-        
-        with allure.step("验证错误响应"):
-            assert response.status_code == expected_status or not response.is_success
-    
-    @allure_severity("critical")
-    @allure_tag("smoke", "positive")
-    @pytest.mark.smoke
-    @pytest.mark.positive
-    @pytest.mark.auth
-    def test_signup(self):
-        """测试用户注册"""
-        import uuid
-        
-        with allure.step("生成唯一邮箱"):
-            unique_email = f"test_{uuid.uuid4().hex[:8]}@example.com"
-            password = "Test123456"
-        
-        with allure.step("执行注册请求"):
-            response = self.auth_manager.signup(
-                email=unique_email,
-                password=password,
-                user_metadata={"name": "Test User"}
-            )
-        
-        with allure.step("验证响应"):
-            handler = ResponseHandler(response)
-            # 注册可能成功或失败（如果用户已存在）
-            if response.is_success:
-                handler.assert_success()
-    
-    
     @allure_severity("normal")
     @allure_tag("positive")
     @pytest.mark.positive
     @pytest.mark.auth
     def test_logout(self):
         """测试用户登出"""
+        # 确保先登录
+        with allure.step("确保用户已登录"):
+            self.auth_manager.login(self.test_email, self.test_password)
+        
         with allure.step("执行登出"):
             response = self.auth_manager.logout()
         
@@ -135,6 +111,9 @@ class TestAuthDataDriven:
         cls.api_client = ApiClient()
         cls.auth_manager = AuthManager(cls.api_client)
         cls.data_provider = DataProvider()
+        # 为数据驱动测试生成测试账号
+        cls.test_email = faker_helper.generate_email(prefix='test')
+        cls.test_password = faker_helper.generate_password()
     
     @classmethod
     def teardown_class(cls):
@@ -159,19 +138,56 @@ class TestAuthDataDriven:
             
             data = test_data.data
             
+            # 根据测试场景使用不同的账号数据
+            if "正常登录" in test_data.name:
+                # 使用类级别的测试账号
+                email = self.test_email
+                password = self.test_password
+                # 确保账号已注册
+                with allure.step(f"确保账号 {email} 已注册"):
+                    signup_response = self.auth_manager.signup(
+                        email=email,
+                        password=password,
+                        user_metadata={"name": faker_helper.generate_name()}
+                    )
+            elif "错误密码" in test_data.name:
+                # 使用已注册的账号，但使用错误密码
+                email = self.test_email
+                password = "WrongPassword123"
+            elif "不存在的用户" in test_data.name:
+                # 使用未注册的账号
+                email = faker_helper.generate_email(prefix='test')
+                password = faker_helper.generate_password()
+            elif "空邮箱" in test_data.name:
+                # 使用空邮箱
+                email = ""
+                password = faker_helper.generate_password()
+            elif "空密码" in test_data.name:
+                # 使用空密码
+                email = self.test_email
+                password = ""
+            elif "注册" in test_data.name:
+                # 使用类级别的测试账号
+                email = self.test_email
+                password = self.test_password
+            else:
+                # 默认使用类级别的测试账号
+                email = self.test_email
+                password = self.test_password
+            
             # 根据测试数据决定执行登录还是注册
             if "注册" in test_data.name:
-                with allure.step("执行注册"):
+                with allure.step(f"使用邮箱 {email} 执行注册"):
                     response = self.auth_manager.signup(
-                        email=data.get('email', ''),
-                        password=data.get('password', ''),
-                        user_metadata=data.get('user_metadata')
+                        email=email,
+                        password=password,
+                        user_metadata=data.get('user_metadata') or {"name": faker_helper.generate_name()}
                     )
             else:
-                with allure.step("执行登录"):
+                with allure.step(f"使用邮箱 {email} 执行登录"):
                     response = self.auth_manager.login(
-                        email=data.get('email', ''),
-                        password=data.get('password', '')
+                        email=email,
+                        password=password
                     )
             
             with allure.step("验证响应"):

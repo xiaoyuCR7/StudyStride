@@ -14,6 +14,7 @@ from core.auth_manager import AuthManager
 from utils.data_provider import DataProvider, TestData
 from utils.allure_helper import allure_feature, allure_story, allure_severity, allure_tag
 from utils.retry_helper import retry_on_failure
+from utils.faker_helper import faker_helper
 
 
 @allure_feature("科目管理")
@@ -29,11 +30,22 @@ class TestSubject:
         cls.data_provider = DataProvider()
         cls.base_endpoint = "subjects"
         
+        # 生成测试账号
+        cls.test_email = faker_helper.generate_email(prefix='test')
+        cls.test_password = faker_helper.generate_password()
+        cls.test_name = faker_helper.generate_name()
+        
+        # 先注册
+        with allure.step(f"使用邮箱 {cls.test_email} 注册"):
+            signup_response = cls.auth_manager.signup(
+                email=cls.test_email,
+                password=cls.test_password,
+                user_metadata={"name": cls.test_name}
+            )
+        
         # 执行登录，获取认证令牌
-        with allure.step("执行登录获取认证令牌"):
-            email = "1178327328@qq.com"
-            password = "12345678"
-            login_response = cls.auth_manager.login(email, password)
+        with allure.step(f"使用邮箱 {cls.test_email} 登录获取认证令牌"):
+            login_response = cls.auth_manager.login(cls.test_email, cls.test_password)
             if not login_response.is_success:
                 allure.attach(
                     f"登录失败: {login_response.data}",
@@ -45,17 +57,16 @@ class TestSubject:
     @classmethod
     def teardown_class(cls):
         """测试类清理"""
+        # 登出
+        with allure.step("执行登出"):
+            cls.auth_manager.logout()
         cls.api_client.close()
     
     @pytest.fixture(scope="class")
     def user_id(self):
         """获取用户ID"""
-        with allure.step("准备测试数据"):
-            email = "1178327328@qq.com"
-            password = "12345678"
-        
-        with allure.step("执行登录请求"):
-            response = self.auth_manager.login(email, password)
+        with allure.step(f"使用邮箱 {self.test_email} 登录获取用户ID"):
+            response = self.auth_manager.login(self.test_email, self.test_password)
         
         with allure.step("验证响应"):
             if response.is_success:

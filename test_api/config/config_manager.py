@@ -98,7 +98,7 @@ class ConfigManager:
             self._dotenv_loaded = True
             print(f"[ConfigManager] 已加载环境变量文件: {dotenv_path}")
     
-    def _get_default_config_path(self) -> str:
+    def _get_default_config_path(self) -> Optional[str]:
         """获取默认配置文件路径"""
         current_dir = Path(__file__).parent
         yaml_path = current_dir / "settings.yaml"
@@ -109,14 +109,32 @@ class ConfigManager:
         elif json_path.exists():
             return str(json_path)
         else:
-            raise FileNotFoundError("未找到配置文件 settings.yaml 或 settings.json")
+            # 如果配置文件不存在，返回None，后续会依赖环境变量
+            print("[ConfigManager] 未找到配置文件，将从环境变量读取配置")
+            return None
     
     def _load_config(self):
         """加载配置文件"""
+        # 如果没有配置文件路径，使用默认配置
+        if self.config_path is None:
+            print("[ConfigManager] 使用默认配置结构")
+            self._config_data = self._get_default_config_structure()
+            # 设置默认环境
+            self._current_env = os.getenv('TEST_ENV', self._get_default_env())
+            # 应用环境变量覆盖
+            self._apply_env_overrides()
+            return
+        
         path = Path(self.config_path)
         
         if not path.exists():
-            raise FileNotFoundError(f"配置文件不存在: {self.config_path}")
+            print(f"[ConfigManager] 配置文件不存在: {self.config_path}，将使用默认配置")
+            self._config_data = self._get_default_config_structure()
+            # 设置默认环境
+            self._current_env = os.getenv('TEST_ENV', self._get_default_env())
+            # 应用环境变量覆盖
+            self._apply_env_overrides()
+            return
         
         with open(path, 'r', encoding='utf-8') as f:
             if path.suffix in ['.yaml', '.yml']:
@@ -131,6 +149,70 @@ class ConfigManager:
         
         # 应用环境变量覆盖
         self._apply_env_overrides()
+    
+    def _get_default_config_structure(self) -> Dict[str, Any]:
+        """获取默认配置结构"""
+        return {
+            "default_env": os.getenv('TEST_ENV', 'dev'),
+            "environments": {
+                "dev": {
+                    "name": "开发环境",
+                    "base_url": os.getenv('DEV_SUPABASE_URL', ''),
+                    "auth_url": f"{os.getenv('DEV_SUPABASE_URL', '')}/auth/v1" if os.getenv('DEV_SUPABASE_URL') else '',
+                    "rest_url": f"{os.getenv('DEV_SUPABASE_URL', '')}/rest/v1" if os.getenv('DEV_SUPABASE_URL') else '',
+                    "anon_key": os.getenv('DEV_SUPABASE_ANON_KEY', ''),
+                    "timeout": 30,
+                    "retry_times": 3,
+                    "retry_interval": 1
+                },
+                "test": {
+                    "name": "测试环境",
+                    "base_url": os.getenv('TEST_SUPABASE_URL', ''),
+                    "auth_url": f"{os.getenv('TEST_SUPABASE_URL', '')}/auth/v1" if os.getenv('TEST_SUPABASE_URL') else '',
+                    "rest_url": f"{os.getenv('TEST_SUPABASE_URL', '')}/rest/v1" if os.getenv('TEST_SUPABASE_URL') else '',
+                    "anon_key": os.getenv('TEST_SUPABASE_ANON_KEY', ''),
+                    "timeout": 30,
+                    "retry_times": 3,
+                    "retry_interval": 1
+                },
+                "prod": {
+                    "name": "生产环境",
+                    "base_url": os.getenv('PROD_SUPABASE_URL', ''),
+                    "auth_url": f"{os.getenv('PROD_SUPABASE_URL', '')}/auth/v1" if os.getenv('PROD_SUPABASE_URL') else '',
+                    "rest_url": f"{os.getenv('PROD_SUPABASE_URL', '')}/rest/v1" if os.getenv('PROD_SUPABASE_URL') else '',
+                    "anon_key": os.getenv('PROD_SUPABASE_ANON_KEY', ''),
+                    "timeout": 30,
+                    "retry_times": 3,
+                    "retry_interval": 1
+                }
+            },
+            "test": {
+                "markers": {
+                    "smoke": "冒烟测试",
+                    "regression": "回归测试",
+                    "api": "接口测试",
+                    "auth": "认证测试",
+                    "study_session": "学习会话测试",
+                    "subject": "科目测试",
+                    "user_settings": "用户设置测试",
+                    "positive": "正向测试",
+                    "negative": "负向测试",
+                    "critical": "关键用例"
+                }
+            }
+        }
+    
+    def _get_default_env(self) -> str:
+        """获取默认环境"""
+        # 优先使用TEST_ENV环境变量
+        if os.getenv('TEST_ENV'):
+            return os.getenv('TEST_ENV')
+        # 其次检查各个环境的SUPABASE_URL是否存在
+        for env in ['dev', 'test', 'prod']:
+            if os.getenv(f'{env.upper()}_SUPABASE_URL'):
+                return env
+        # 默认使用dev
+        return 'dev'
     
     def _apply_env_overrides(self):
         """应用环境变量覆盖配置"""
@@ -208,7 +290,7 @@ class ConfigManager:
         env = env or self._current_env
         env_upper = env.upper()
         
-        # 首先尝试从.env/环境变量读取
+        # 首先尝试从环境变量读取
         base_url = os.getenv(f'{env_upper}_SUPABASE_URL')
         anon_key = os.getenv(f'{env_upper}_SUPABASE_ANON_KEY')
         
@@ -229,7 +311,7 @@ class ConfigManager:
         env_data = self.get(f'environments.{env}')
         
         if not env_data:
-            raise ValueError(f"未找到环境配置: {env}")
+            raise ValueError(f"未找到环境配置: {env}，请确保已设置环境变量 {env_upper}_SUPABASE_URL 和 {env_upper}_SUPABASE_ANON_KEY")
         
         return EnvironmentConfig(
             name=env_data.get('name', env),
