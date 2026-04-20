@@ -29,8 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: frontend-build
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      TEST_ENV: ${{ secrets.TEST_ENV }}
+      DEV_SUPABASE_URL: ${{ secrets.DEV_SUPABASE_URL }}
+      DEV_SUPABASE_ANON_KEY: ${{ secrets.DEV_SUPABASE_ANON_KEY }}
       SUPABASE_AUTH_URL: ${{ secrets.SUPABASE_AUTH_URL }}
       SUPABASE_REST_URL: ${{ secrets.SUPABASE_REST_URL }}
     steps:
