@@ -152,35 +152,44 @@ class ConfigManager:
     
     def _get_default_config_structure(self) -> Dict[str, Any]:
         """获取默认配置结构"""
+        # 从环境变量读取配置
+        dev_url = os.getenv('DEV_SUPABASE_URL', 'https://pkhlytcqjgspkmsmzxpg.supabase.co')
+        test_url = os.getenv('TEST_SUPABASE_URL', 'https://test-project-id.supabase.co')
+        prod_url = os.getenv('PROD_SUPABASE_URL', 'https://prod-project-id.supabase.co')
+        
+        dev_anon_key = os.getenv('DEV_SUPABASE_ANON_KEY', 'sb_publishable_ZF3uREWZRRqZpfV-zykABw_W802i9ig')
+        test_anon_key = os.getenv('TEST_SUPABASE_ANON_KEY', 'test-anon-key')
+        prod_anon_key = os.getenv('PROD_SUPABASE_ANON_KEY', 'prod-anon-key')
+        
         return {
             "default_env": os.getenv('TEST_ENV', 'dev'),
             "environments": {
                 "dev": {
                     "name": "开发环境",
-                    "base_url": os.getenv('DEV_SUPABASE_URL', ''),
-                    "auth_url": f"{os.getenv('DEV_SUPABASE_URL', '')}/auth/v1" if os.getenv('DEV_SUPABASE_URL') else '',
-                    "rest_url": f"{os.getenv('DEV_SUPABASE_URL', '')}/rest/v1" if os.getenv('DEV_SUPABASE_URL') else '',
-                    "anon_key": os.getenv('DEV_SUPABASE_ANON_KEY', ''),
+                    "base_url": dev_url,
+                    "auth_url": f"{dev_url}/auth/v1",
+                    "rest_url": f"{dev_url}/rest/v1",
+                    "anon_key": dev_anon_key,
                     "timeout": 30,
                     "retry_times": 3,
                     "retry_interval": 1
                 },
                 "test": {
                     "name": "测试环境",
-                    "base_url": os.getenv('TEST_SUPABASE_URL', ''),
-                    "auth_url": f"{os.getenv('TEST_SUPABASE_URL', '')}/auth/v1" if os.getenv('TEST_SUPABASE_URL') else '',
-                    "rest_url": f"{os.getenv('TEST_SUPABASE_URL', '')}/rest/v1" if os.getenv('TEST_SUPABASE_URL') else '',
-                    "anon_key": os.getenv('TEST_SUPABASE_ANON_KEY', ''),
+                    "base_url": test_url,
+                    "auth_url": f"{test_url}/auth/v1",
+                    "rest_url": f"{test_url}/rest/v1",
+                    "anon_key": test_anon_key,
                     "timeout": 30,
                     "retry_times": 3,
                     "retry_interval": 1
                 },
                 "prod": {
                     "name": "生产环境",
-                    "base_url": os.getenv('PROD_SUPABASE_URL', ''),
-                    "auth_url": f"{os.getenv('PROD_SUPABASE_URL', '')}/auth/v1" if os.getenv('PROD_SUPABASE_URL') else '',
-                    "rest_url": f"{os.getenv('PROD_SUPABASE_URL', '')}/rest/v1" if os.getenv('PROD_SUPABASE_URL') else '',
-                    "anon_key": os.getenv('PROD_SUPABASE_ANON_KEY', ''),
+                    "base_url": prod_url,
+                    "auth_url": f"{prod_url}/auth/v1",
+                    "rest_url": f"{prod_url}/rest/v1",
+                    "anon_key": prod_anon_key,
                     "timeout": 30,
                     "retry_times": 3,
                     "retry_interval": 1
