@@ -153,11 +153,11 @@ class ConfigManager:
     def _get_default_config_structure(self) -> Dict[str, Any]:
         """获取默认配置结构"""
         # 从环境变量读取配置
-        dev_url = os.getenv('DEV_SUPABASE_URL', 'https://pkhlytcqjgspkmsmzxpg.supabase.co')
+        dev_url = os.getenv('DEV_SUPABASE_URL', '')
         test_url = os.getenv('TEST_SUPABASE_URL', 'https://test-project-id.supabase.co')
         prod_url = os.getenv('PROD_SUPABASE_URL', 'https://prod-project-id.supabase.co')
         
-        dev_anon_key = os.getenv('DEV_SUPABASE_ANON_KEY', 'sb_publishable_ZF3uREWZRRqZpfV-zykABw_W802i9ig')
+        dev_anon_key = os.getenv('DEV_SUPABASE_ANON_KEY', '')
         test_anon_key = os.getenv('TEST_SUPABASE_ANON_KEY', 'test-anon-key')
         prod_anon_key = os.getenv('PROD_SUPABASE_ANON_KEY', 'prod-anon-key')
         
