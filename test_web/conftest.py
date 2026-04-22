@@ -3,9 +3,36 @@ from playwright.sync_api import Playwright, sync_playwright
 import sys
 import os
 
-# 添加当前目录到Python路径
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from config.config import config
+from utils.logger import setup_logging, get_logger
+
+setup_logging()
+logger = get_logger(__name__)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def session_logger():
+    """会话级别的日志记录"""
+    logger.info("=" * 60)
+    logger.info("测试会话开始")
+    logger.info(f"基础URL: {config.BASE_URL}")
+    logger.info(f"浏览器: {config.BROWSER}")
+    logger.info(f"无头模式: {config.HEADLESS}")
+    logger.info("=" * 60)
+    yield
+    logger.info("=" * 60)
+    logger.info("测试会话结束")
+    logger.info("=" * 60)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def test_logger(request):
+    """测试函数级别的日志记录"""
+    test_name = request.node.name
+    logger.info(f"开始测试: {test_name}")
+    yield
+    logger.info(f"结束测试: {test_name}")
 
 @pytest.fixture(scope="session")
 def playwright():

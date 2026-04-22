@@ -19,8 +19,10 @@ export const useAuthStore = defineStore('auth', {
       await useTimerStore().loadAll()
 
       supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('认证状态变化:', { event, session })
         this.session = session
         this.user = session?.user ?? null
+        console.log('状态已更新:', { session: this.session, user: this.user, isLoggedIn: !!this.session })
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
           await useTimerStore().loadAll()
         }
@@ -35,7 +37,24 @@ export const useAuthStore = defineStore('auth', {
       return { error }
     },
     async signOut() {
-      await supabase.auth.signOut()
+      try {
+        console.log('开始执行退出登录')
+        const { error } = await supabase.auth.signOut({})
+        if (error) {
+          console.error('退出登录失败:', error)
+        } else {
+          console.log('退出登录成功')
+          // 强制重置状态
+          this.session = null
+          this.user = null
+          console.log('状态已重置:', { session: this.session, user: this.user })
+        }
+      } catch (error) {
+        console.error('退出登录异常:', error)
+        // 即使出错也重置状态
+        this.session = null
+        this.user = null
+      }
     }
   }
 })
