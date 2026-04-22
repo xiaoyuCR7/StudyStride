@@ -36,7 +36,8 @@ const errorMessage = ref('')
 const infoMessage = ref('')
 
 const validateEmail = (email: string): boolean => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  // 更严格的邮箱验证，要求域名至少有两个部分
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\.[a-zA-Z]{2,}$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
   return emailRegex.test(email)
 }
 
@@ -55,13 +56,25 @@ const onSubmit = async () => {
   }
   
   loading.value = true
-  const { error } = await auth.signIn(email.value.trim(), password.value)
-  loading.value = false
-  if (error) {
-    errorMessage.value = error.message
-    return
+  try {
+    console.log('开始登录:', email.value.trim())
+    const { error } = await auth.signIn(email.value.trim(), password.value)
+    console.log('登录结果:', { error })
+    if (error) {
+      errorMessage.value = error.message
+      return
+    }
+    console.log('登录成功，准备跳转到首页')
+    // 延迟一小段时间确保状态更新完成
+    setTimeout(() => {
+      loading.value = false
+      router.push('/')
+    }, 500)
+  } catch (err) {
+    console.error('登录异常:', err)
+    errorMessage.value = '登录失败，请稍后重试'
+    loading.value = false
   }
-  router.push('/')
 }
 
 const onRegister = async () => {

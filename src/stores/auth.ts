@@ -39,22 +39,24 @@ export const useAuthStore = defineStore('auth', {
     async signOut() {
       try {
         console.log('开始执行退出登录')
+        // 先清除本地状态
+        this.session = null
+        this.user = null
+        console.log('本地状态已重置')
+        
         const { error } = await supabase.auth.signOut({})
         if (error) {
           console.error('退出登录失败:', error)
         } else {
           console.log('退出登录成功')
-          // 强制重置状态
-          this.session = null
-          this.user = null
-          console.log('状态已重置:', { session: this.session, user: this.user })
         }
       } catch (error) {
         console.error('退出登录异常:', error)
-        // 即使出错也重置状态
+        // 即使出错也确保状态被重置
         this.session = null
         this.user = null
       }
+      console.log('退出登录完成，最终状态:', { session: this.session, user: this.user, isLoggedIn: !!this.session })
     }
   }
 })
