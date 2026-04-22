@@ -265,7 +265,7 @@ onUnmounted(() => {
 h1 {
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -273,20 +273,20 @@ h1 {
 }
 
 .timer-container {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
   border-radius: 16px;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--card-border);
 }
 
 .timer-container:hover {
   transform: translateY(-5px);
-  box-shadow: 0 16px 48px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .subject-selection {
@@ -300,47 +300,52 @@ h1 {
 
 .subject-selection label {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--text-color);
   font-weight: bold;
 }
 
 .subject-selection select {
   padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   min-width: 200px;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.87);
+  background: var(--navbar-user-bg);
+  color: #9c27b0;
   transition: all 0.3s ease;
 }
 
+.subject-selection select option {
+  color: #9c27b0;
+  background: var(--background-color);
+}
+
 .subject-selection select:hover {
-  border-color: #d500f9;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  border-color: var(--primary-light);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .add-subject-btn {
   padding: 0.75rem 1.5rem;
   background: rgba(156, 39, 176, 0.8);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 
 .add-subject-btn:hover {
   background: rgba(156, 39, 176, 1);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .add-subject-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 4px 12px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 
 /* 弹窗样式 */
@@ -361,24 +366,24 @@ h1 {
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 16px 48px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--card-shadow);
   min-width: 350px;
   max-width: 90%;
   max-height: 90%;
   overflow-y: auto;
   animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--card-border);
 }
 
 .modal-content h3 {
   margin-bottom: 1.5rem;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -390,24 +395,25 @@ h1 {
 .modal-content input {
   width: 100%;
   padding: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   margin-bottom: 2rem;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.87);
+  background: var(--glass-bg);
+  color: var(--text-color);
 }
 
 .modal-content input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 .modal-content input:focus {
   outline: none;
-  border-color: #d500f9;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.3);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .modal-buttons {
@@ -418,14 +424,14 @@ h1 {
 
 .modal-buttons button {
   padding: 0.875rem 1.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 100px;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 
 .modal-buttons button:first-child {
@@ -440,13 +446,13 @@ h1 {
 
 .modal-buttons button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--button-hover-shadow);
   opacity: 1;
 }
 
 .modal-buttons button:active {
   transform: translateY(1px);
-  box-shadow: 0 4px 12px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 
 @keyframes fadeIn {
@@ -497,30 +503,31 @@ h1 {
 .current-subject {
   margin-bottom: 1.5rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(156, 39, 176, 0.2);
+  background: var(--navbar-item-bg);
   border-radius: 12px;
   display: inline-block;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--navbar-user-border);
   transition: all 0.3s ease;
 }
 
 .current-subject:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--navbar-item-shadow);
 }
 
 .subject-label {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-color);
+  opacity: 0.8;
   margin-right: 0.5rem;
 }
 
 .subject-name {
   font-size: 1rem;
   font-weight: bold;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -530,7 +537,7 @@ h1 {
   font-size: 4rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -559,12 +566,12 @@ h1 {
 
 button {
   padding: 0.75rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
@@ -592,34 +599,34 @@ button:nth-child(4) {
 button:hover {
   opacity: 1;
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 
 button:active {
   transform: translateY(1px);
-  box-shadow: 0 4px 12px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 
 .content-container {
   margin: 2rem 0;
   animation: slideInUp 0.5s ease-out;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
 }
 
 .content-container:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .content-container h2 {
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -630,48 +637,49 @@ textarea {
   width: 100%;
   height: 150px;
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   resize: vertical;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.87);
+  background: var(--navbar-user-bg);
+  color: #9c27b0;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 
 textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 textarea:focus {
   outline: none;
-  border-color: #d500f9;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.3);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .today-summary {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
   border-radius: 16px;
   margin-top: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: var(--card-shadow);
   animation: fadeIn 1s ease-in-out 0.3s both;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--card-border);
   transition: all 0.3s ease;
 }
 
 .today-summary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .today-summary h2 {
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -690,23 +698,24 @@ textarea:focus {
   padding: 1.5rem;
   border-radius: 12px;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--navbar-user-bg);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--navbar-user-border);
   flex: 1;
 }
 
 .stat-item:hover {
   transform: translateY(-5px);
-  background: rgba(156, 39, 176, 0.2);
-  box-shadow: 0 8px 24px 0 rgba(156, 39, 176, 0.3);
+  background: var(--navbar-item-bg);
+  box-shadow: var(--navbar-item-shadow);
 }
 
 .stat-label {
   display: block;
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-color);
+  opacity: 0.8;
   margin-bottom: 0.5rem;
 }
 
@@ -714,7 +723,7 @@ textarea:focus {
   display: block;
   font-size: 1.5rem;
   font-weight: bold;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -744,26 +753,26 @@ textarea:focus {
 }
 
 .quick-record {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
   border-radius: 16px;
   margin-top: 2rem;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: var(--card-shadow);
   animation: fadeIn 1s ease-in-out;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--card-border);
   transition: all 0.3s ease;
 }
 
 .quick-record:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .quick-record h2 {
   margin-bottom: 1.5rem;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -785,33 +794,39 @@ textarea:focus {
 
 .form-group label {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--text-color);
   font-weight: bold;
 }
 
 .form-group select,
 .form-group textarea {
   padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.87);
+  background: var(--navbar-user-bg);
+  color: #9c27b0;
   transition: all 0.3s ease;
   width: 100%;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 
+.form-group select option {
+  color: #9c27b0;
+  background: var(--background-color);
+}
+
 .form-group select::placeholder,
 .form-group textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 .form-group select:hover,
 .form-group textarea:hover {
-  border-color: #d500f9;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  border-color: var(--primary-light);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .form-group textarea {
@@ -828,45 +843,46 @@ textarea:focus {
 
 .duration-inputs input {
   padding: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   width: 100px;
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.87);
+  background: var(--navbar-user-bg);
+  color: #9c27b0;
   transition: all 0.3s ease;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 
 .duration-inputs input:hover {
-  border-color: #d500f9;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  border-color: var(--primary-light);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .duration-inputs input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 .duration-inputs .separator {
   font-size: 1.25rem;
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--text-color);
 }
 
 .record-btn {
   background: rgba(156, 39, 176, 0.8);
   color: white;
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1.1rem;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1rem;
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
   align-self: center;
   min-width: 200px;
 }
@@ -874,12 +890,12 @@ textarea:focus {
 .record-btn:hover {
   background: rgba(156, 39, 176, 1);
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .record-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 4px 12px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 
 @media (max-width: 768px) {
