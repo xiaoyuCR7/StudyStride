@@ -3,32 +3,86 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #1a1a2e;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   
-  /* 紫色主题变量 */
+  /* 主题变量 - 默认暗色模式 */
   --primary-color: #9c27b0;
   --primary-light: #d500f9;
   --primary-dark: #6a0080;
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --text-color: rgba(255, 255, 255, 0.87);
+  --background-color: #1a1a2e;
+  --background-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --navbar-bg: rgba(255, 255, 255, 0.1);
+  --navbar-border: rgba(255, 255, 255, 0.2);
+  --navbar-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --footer-bg: rgba(255, 255, 255, 0.1);
+  --footer-border: rgba(255, 255, 255, 0.2);
+  --footer-shadow: 0 -8px 32px 0 rgba(31, 38, 135, 0.37);
+  --card-bg: rgba(255, 255, 255, 0.1);
+  --card-border: rgba(255, 255, 255, 0.2);
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --navbar-item-bg: rgba(156, 39, 176, 0.2);
+  --navbar-item-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  --navbar-user-bg: rgba(255, 255, 255, 0.05);
+  --navbar-user-border: rgba(255, 255, 255, 0.1);
+  --logout-btn-bg: rgba(255, 255, 255, 0.1);
+  --logout-btn-border: rgba(255, 255, 255, 0.2);
+  --logout-btn-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  --h1-gradient: linear-gradient(45deg, #d500f9, #9c27b0);
+  --button-hover-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+  --button-active-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  --card-hover-shadow: 0 16px 48px 0 rgba(156, 39, 176, 0.4);
+  --navbar-hover-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+}
+
+/* 白天模式 */
+:root.light {
+  --primary-color: #9c27b0;
+  --primary-light: #d500f9;
+  --primary-dark: #6a0080;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(100, 149, 237, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(100, 149, 237, 0.2);
+  --text-color: #1e90ff;
+  --background-color: #f8f9fa;
+  --background-gradient: linear-gradient(135deg, #ffffff 0%, #f5f5dc 100%);
+  --navbar-bg: rgba(255, 255, 255, 0.9);
+  --navbar-border: rgba(100, 149, 237, 0.3);
+  --navbar-shadow: 0 8px 32px 0 rgba(100, 149, 237, 0.2);
+  --footer-bg: rgba(255, 255, 255, 0.9);
+  --footer-border: rgba(100, 149, 237, 0.3);
+  --footer-shadow: 0 -8px 32px 0 rgba(100, 149, 237, 0.2);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-border: rgba(100, 149, 237, 0.3);
+  --card-shadow: 0 8px 32px 0 rgba(100, 149, 237, 0.2);
+  --navbar-item-bg: rgba(100, 149, 237, 0.1);
+  --navbar-item-shadow: 0 4px 16px 0 rgba(100, 149, 237, 0.2);
+  --navbar-user-bg: rgba(100, 149, 237, 0.05);
+  --navbar-user-border: rgba(100, 149, 237, 0.2);
+  --logout-btn-bg: rgba(100, 149, 237, 0.05);
+  --logout-btn-border: rgba(100, 149, 237, 0.2);
+  --logout-btn-shadow: 0 4px 16px 0 rgba(100, 149, 237, 0.2);
+  --h1-gradient: linear-gradient(45deg, #1e90ff, #6495ed);
+  --button-hover-shadow: 0 12px 40px 0 rgba(100, 149, 237, 0.3);
+  --button-active-shadow: 0 4px 16px 0 rgba(100, 149, 237, 0.2);
+  --card-hover-shadow: 0 16px 48px 0 rgba(100, 149, 237, 0.3);
+  --navbar-hover-shadow: 0 12px 40px 0 rgba(100, 149, 237, 0.3);
 }
 
 a {
   font-weight: 500;
-  color: #d500f9;
+  color: var(--primary-light);
   text-decoration: inherit;
   transition: all 0.3s ease;
 }
 a:hover {
-  color: #ffffff;
+  color: var(--text-color);
   transform: translateY(-2px);
 }
 
@@ -38,13 +92,14 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: var(--background-gradient);
+  color: var(--text-color);
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-  background: linear-gradient(45deg, #d500f9, #9c27b0);
+  background: var(--h1-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -60,7 +115,7 @@ button {
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--text-color);
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--glass-shadow);
@@ -68,11 +123,11 @@ button {
 button:hover {
   border-color: var(--primary-light);
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--button-hover-shadow);
 }
 button:active {
   transform: translateY(1px);
-  box-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
 }
 button:focus,
 button:focus-visible {
@@ -82,17 +137,17 @@ button:focus-visible {
 
 .card {
   padding: 2em;
-  background: var(--glass-bg);
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
 }
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 16px 48px 0 rgba(156, 39, 176, 0.4);
+  box-shadow: var(--card-hover-shadow);
 }
 
 #app {
