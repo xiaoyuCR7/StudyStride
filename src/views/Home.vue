@@ -126,11 +126,15 @@ const showAddSubjectModal = () => {
 
 const addSubject = () => {
   if (newSubjectName.value.trim()) {
-    store.addSubject(newSubjectName.value.trim())
-    selectedSubject.value = newSubjectName.value.trim()
-    store.setSelectedSubject(selectedSubject.value)
-    showAddSubjectModalFlag.value = false
-    newSubjectName.value = ''
+    const result = store.addSubject(newSubjectName.value.trim())
+    if (result.success) {
+      selectedSubject.value = newSubjectName.value.trim()
+      store.setSelectedSubject(selectedSubject.value)
+      showAddSubjectModalFlag.value = false
+      newSubjectName.value = ''
+    } else {
+      alert(result.message)
+    }
   }
 }
 

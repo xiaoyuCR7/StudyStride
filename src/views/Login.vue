@@ -35,9 +35,25 @@ const loading = ref(false)
 const errorMessage = ref('')
 const infoMessage = ref('')
 
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  return emailRegex.test(email)
+}
+
 const onSubmit = async () => {
   errorMessage.value = ''
   infoMessage.value = ''
+  
+  if (!validateEmail(email.value.trim())) {
+    errorMessage.value = '请输入有效的邮箱地址'
+    return
+  }
+  
+  if (password.value.length < 6) {
+    errorMessage.value = '密码长度至少为6位'
+    return
+  }
+  
   loading.value = true
   const { error } = await auth.signIn(email.value.trim(), password.value)
   loading.value = false
@@ -51,6 +67,17 @@ const onSubmit = async () => {
 const onRegister = async () => {
   errorMessage.value = ''
   infoMessage.value = ''
+  
+  if (!validateEmail(email.value.trim())) {
+    errorMessage.value = '请输入有效的邮箱地址'
+    return
+  }
+  
+  if (password.value.length < 6) {
+    errorMessage.value = '密码长度至少为6位'
+    return
+  }
+  
   loading.value = true
   const { error } = await auth.signUp(email.value.trim(), password.value)
   loading.value = false

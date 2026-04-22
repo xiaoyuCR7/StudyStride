@@ -61,7 +61,16 @@ onMounted(() => {
 })
 
 const logout = async () => {
-  await auth.signOut()
+  console.log('退出按钮被点击')
+  console.log('当前认证状态:', auth.isLoggedIn)
+  console.log('当前用户:', auth.user)
+  
+  try {
+    await auth.signOut()
+    console.log('退出登录调用完成')
+  } catch (error) {
+    console.error('退出登录失败:', error)
+  }
 }
 </script>
 
@@ -186,18 +195,28 @@ body {
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.3s ease;
+  font-family: inherit;
+  box-shadow: var(--logout-btn-shadow);
+  z-index: 10;
+  position: relative;
 }
 
 .logout-btn:hover {
   border-color: var(--primary-light);
   color: var(--primary-light);
   transform: translateY(-2px);
-  box-shadow: var(--logout-btn-shadow);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .logout-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px 0 rgba(156, 39, 176, 0.3);
+  box-shadow: var(--button-active-shadow);
+}
+
+.logout-btn:focus,
+.logout-btn:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
 }
 
 .theme-toggle {

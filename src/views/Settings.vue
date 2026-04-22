@@ -167,9 +167,13 @@ const requestNotificationPermission = () => {
 
 const addSubject = () => {
   if (newSubjectName.value.trim()) {
-    store.addSubject(newSubjectName.value.trim())
-    showToastMessage('科目添加成功')
-    newSubjectName.value = ''
+    const result = store.addSubject(newSubjectName.value.trim())
+    if (result.success) {
+      showToastMessage('科目添加成功')
+      newSubjectName.value = ''
+    } else {
+      showToastMessage(result.message)
+    }
   }
 }
 
@@ -182,9 +186,13 @@ const showEditSubjectModal = (subject: any) => {
 
 const confirmEditSubject = () => {
   if (editSubjectName.value.trim() && editingSubject.value) {
-    store.updateSubject(editingSubject.value.id, editSubjectName.value.trim())
-    showToastMessage('科目更新成功')
-    cancelEditSubject()
+    const result = store.updateSubject(editingSubject.value.id, editSubjectName.value.trim())
+    if (result.success) {
+      showToastMessage('科目更新成功')
+      cancelEditSubject()
+    } else {
+      showToastMessage(result.message)
+    }
   }
 }
 

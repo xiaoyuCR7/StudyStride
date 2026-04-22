@@ -61,12 +61,17 @@ export const useTimerStore = defineStore('timer', {
       }
     },
 
-    addSubject(name: string) {
-      // 验证科目名称不能为空
+    addSubject(name: string): { success: boolean; message: string } {
       const trimmedName = name.trim()
       if (!trimmedName) {
-        console.warn('科目名称不能为空')
-        return
+        return { success: false, message: '科目名称不能为空' }
+      }
+      
+      const exists = this.subjects.some(
+        (s) => s.name.toLowerCase() === trimmedName.toLowerCase()
+      )
+      if (exists) {
+        return { success: false, message: '该科目名称已存在，请使用不同的名称' }
       }
       
       const newSubject: Subject = {
@@ -75,6 +80,7 @@ export const useTimerStore = defineStore('timer', {
       }
       this.subjects.push(newSubject)
       void this.saveSubjects()
+      return { success: true, message: '科目添加成功' }
     },
 
     removeSubject(id: string) {
@@ -82,12 +88,26 @@ export const useTimerStore = defineStore('timer', {
       void this.saveSubjects()
     },
 
-    updateSubject(id: string, name: string) {
+    updateSubject(id: string, name: string): { success: boolean; message: string } {
+      const trimmedName = name.trim()
+      if (!trimmedName) {
+        return { success: false, message: '科目名称不能为空' }
+      }
+      
+      const exists = this.subjects.some(
+        (s) => s.id !== id && s.name.toLowerCase() === trimmedName.toLowerCase()
+      )
+      if (exists) {
+        return { success: false, message: '该科目名称已存在，请使用不同的名称' }
+      }
+      
       const subject = this.subjects.find((s) => s.id === id)
       if (subject) {
-        subject.name = name
+        subject.name = trimmedName
         void this.saveSubjects()
+        return { success: true, message: '科目更新成功' }
       }
+      return { success: false, message: '科目不存在' }
     },
 
     setSelectedSubject(subject: string) {
