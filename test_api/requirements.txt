@@ -26,3 +26,6 @@ python-dotenv>=1.0.0
 
 # 测试数据生成
 Faker>=19.13.0
+
+# JSON Schema 验证
+jsonschema>=4.17.3

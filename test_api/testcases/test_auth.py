@@ -13,6 +13,7 @@ from utils.data_provider import DataProvider, TestData
 from utils.allure_helper import allure_feature, allure_story, allure_severity, allure_tag
 from utils.retry_helper import retry_on_failure
 from utils.faker_helper import faker_helper
+from utils.schema_validator import validate_schema
 
 
 @allure_feature("认证管理")
@@ -55,6 +56,23 @@ class TestAuth:
             # 注册可能成功或失败（如果用户已存在）
             if response.is_success:
                 handler.assert_success()
+                
+                # JSON Schema 校验
+                schema_validation_data = None
+                if isinstance(response.data, dict):
+                    schema_validation_data = response.data
+                elif isinstance(response.data, list) and len(response.data) > 0:
+                    schema_validation_data = response.data[0]
+                
+                if schema_validation_data:
+                    with allure.step("JSON Schema 校验"):
+                        validate_schema(schema_validation_data, "auth")
+                else:
+                    allure.attach(
+                        "无法获取数据进行 JSON Schema 校验",
+                        "警告",
+                        allure.attachment_type.TEXT
+                    )
     
     @allure_severity("blocker")
     @allure_tag("smoke", "positive")
@@ -75,6 +93,23 @@ class TestAuth:
                 handler.assert_success()
                 if isinstance(response.data, dict):
                     handler.assert_field_exists('access_token')
+                
+                # JSON Schema 校验
+                schema_validation_data = None
+                if isinstance(response.data, dict):
+                    schema_validation_data = response.data
+                elif isinstance(response.data, list) and len(response.data) > 0:
+                    schema_validation_data = response.data[0]
+                
+                if schema_validation_data:
+                    with allure.step("JSON Schema 校验"):
+                        validate_schema(schema_validation_data, "auth")
+                else:
+                    allure.attach(
+                        "无法获取数据进行 JSON Schema 校验",
+                        "警告",
+                        allure.attachment_type.TEXT
+                    )
             else:
                 # 如果登录失败，可能是测试环境未配置
                 allure.attach(

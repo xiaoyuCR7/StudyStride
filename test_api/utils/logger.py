@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 from logging.handlers import RotatingFileHandler
 from typing import Optional
 
@@ -50,6 +50,33 @@ class LoggerManager:
     _loggers: dict = {}
     _initialized: bool = False
     _log_dir: Optional[Path] = None
+    
+    @classmethod
+    def _cleanup_old_logs(cls, days_to_keep: int = 2):
+        """
+        自动删除超过指定天数的日志文件
+        
+        Args:
+            days_to_keep: 保留最近几天的日志，默认为2天
+        """
+        if not cls._log_dir or not cls._log_dir.exists():
+            return
+        
+        cutoff_date = datetime.now() - timedelta(days=days_to_keep)
+        deleted_count = 0
+        
+        for log_file in cls._log_dir.glob("test_*.log"):
+            try:
+                file_time = datetime.fromtimestamp(log_file.stat().st_mtime)
+                if file_time < cutoff_date:
+                    log_file.unlink()
+                    deleted_count += 1
+            except Exception as e:
+                pass
+        
+        if deleted_count > 0:
+            root_logger = logging.getLogger()
+            root_logger.info(f"自动清理了 {deleted_count} 个过期日志文件")
     
     @classmethod
     def setup_logging(
@@ -116,6 +143,9 @@ class LoggerManager:
             file_formatter = logging.Formatter(format_string)
             file_handler.setFormatter(file_formatter)
             root_logger.addHandler(file_handler)
+        
+        # 清理过期日志文件
+        cls._cleanup_old_logs(days_to_keep=2)
         
         cls._initialized = True
         root_logger.info(f"日志系统初始化完成，级别: {level}")

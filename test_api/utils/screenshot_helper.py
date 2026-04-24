@@ -29,6 +29,9 @@ class ScreenshotHelper:
         
         self.screenshot_dir.mkdir(parents=True, exist_ok=True)
         self.screenshot_count = 0
+        
+        # 清理过期截图文件
+        self.cleanup_old_screenshots(days=2)
     
     def take_screenshot(
         self,

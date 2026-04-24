@@ -12,6 +12,8 @@ from core.auth_manager import AuthManager
 from utils.faker_helper import faker_helper
 from utils.allure_helper import allure_feature, allure_story, allure_severity, allure_tag
 from utils.retry_helper import retry_on_failure
+from utils.schema_validator import validate_schema
+from utils.db_validator import DBValidator
 
 
 @allure_feature("学习会话管理")
@@ -24,6 +26,7 @@ class TestStudySession:
         """测试类初始化"""
         cls.api_client = ApiClient()
         cls.auth_manager = AuthManager(cls.api_client)
+        cls.db_validator = DBValidator(cls.api_client)
         cls.base_endpoint = "study_sessions"
         cls.subjects_endpoint = "subjects"
         cls.subject_id = None
@@ -149,17 +152,113 @@ class TestStudySession:
         
         with allure.step("验证响应"):
             handler = ResponseHandler(response)
+            
+            # 添加详细的调试信息
+            debug_info = f"状态码: {response.status_code}\n"
+            debug_info += f"数据类型: {type(response.data).__name__}\n"
+            debug_info += f"数据内容: {response.data}\n"
+            
+            # 检查数据结构
+            if isinstance(response.data, dict):
+                debug_info += f"字典键: {list(response.data.keys())}\n"
+            elif isinstance(response.data, list):
+                debug_info += f"列表长度: {len(response.data)}\n"
+                if response.data:
+                    first_item = response.data[0]
+                    if isinstance(first_item, dict):
+                        debug_info += f"列表第一个元素类型: {type(first_item).__name__}\n"
+                        debug_info += f"列表第一个元素键: {list(first_item.keys())}\n"
+                        debug_info += f"列表第一个元素内容: {first_item}\n"
+            
+            allure.attach(
+                debug_info,
+                "响应信息",
+                allure.attachment_type.TEXT
+            )
+            
             assert response.status_code in [200, 201]
+            
+            # 处理不同的数据结构
+            session_id = None
+            session_subject = None
+            schema_validation_data = None
+            
             if response.is_success:
                 if isinstance(response.data, dict):
+                    # 响应是字典
                     handler.assert_field_exists('id')
                     handler.assert_field_exists('user_id')
+                    session_id = response.data['id']
+                    session_subject = response.data['subject']
+                    schema_validation_data = response.data
+                    
                 elif isinstance(response.data, list) and len(response.data) > 0:
-                    # 如果响应是列表，检查第一个元素
+                    # 响应是列表
                     first_item = response.data[0]
                     if isinstance(first_item, dict):
                         handler.assert_field_exists('id', data=first_item)
                         handler.assert_field_exists('user_id', data=first_item)
+                        session_id = first_item['id']
+                        session_subject = first_item['subject']
+                        schema_validation_data = first_item
+                
+                elif isinstance(response.data, str) and response.data.strip() == '':
+                    # 响应是空字符串（Supabase API 行为）
+                    with allure.step("响应体为空，通过查询获取学习会话"):
+                        # 通过用户 ID 和主题查询刚创建的学习会话
+                        query_response = self.api_client.get(
+                            endpoint=f"{self.base_endpoint}?user_id=eq.{self.user_id}&subject=eq.{session_data['subject']}"
+                        )
+                        
+                        if query_response.is_success and isinstance(query_response.data, list) and len(query_response.data) > 0:
+                            first_item = query_response.data[0]
+                            session_id = first_item['id']
+                            session_subject = first_item['subject']
+                            schema_validation_data = first_item
+                            allure.attach(
+                                f"通过查询获取到学习会话: {session_id}",
+                                "查询结果",
+                                allure.attachment_type.TEXT
+                            )
+                        else:
+                            allure.attach(
+                                "无法通过查询获取学习会话",
+                                "警告",
+                                allure.attachment_type.TEXT
+                            )
+                
+                # 验证学习会话主题
+                if session_subject:
+                    assert session_subject == session_data['subject'], f"学习会话主题不匹配: 期望 {session_data['subject']}, 实际 {session_subject}"
+            
+            # JSON Schema 校验（单独分开）
+            if schema_validation_data:
+                with allure.step("JSON Schema 校验"):
+                    validate_schema(schema_validation_data, "study_session")
+            else:
+                allure.attach(
+                    "无法获取数据进行 JSON Schema 校验",
+                    "警告",
+                    allure.attachment_type.TEXT
+                )
+            
+            # 数据库校验（单独分开）
+            if session_id:
+                with allure.step("数据库校验"):
+                    assert self.db_validator.validate_study_session_exists(session_id, session_data)
+                    
+                    # 清理：删除创建的学习会话
+                    with allure.step("清理测试数据"):
+                        delete_response = self.api_client.delete(
+                            endpoint=f"{self.base_endpoint}?id=eq.{session_id}"
+                        )
+                        assert delete_response.status_code in [200, 204]
+            else:
+                allure.attach(
+                    "无法获取 session_id，跳过数据库校验和清理",
+                    "警告",
+                    allure.attachment_type.TEXT
+                )
     
     @allure_severity("normal")
     @allure_tag("positive")
