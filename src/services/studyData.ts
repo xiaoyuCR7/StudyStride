@@ -105,7 +105,7 @@ export async function replaceAllSessions(sessions: StudySession[]): Promise<Stud
     .insert(rows)
   if (insertErr) throw insertErr
 
-  return sessions.map((s, i) => ({
+  return sessions.map((s) => ({
     ...s,
     id: ensureUuid(s.id),
     startTime: normalizeDate(s.startTime),
