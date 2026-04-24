@@ -91,20 +91,26 @@ export async function replaceAllSessions(sessions: StudySession[]): Promise<Stud
     .eq('user_id', userId)
   if (delErr) throw delErr
 
-  const out: StudySession[] = []
-  for (const s of sessions) {
-    const id = ensureUuid(s.id)
-    const row = sessionToRow({ ...s, id }, userId)
-    const { error } = await supabase.from('study_sessions').insert(row)
-    if (error) throw error
-    out.push({
-      ...s,
-      id,
-      startTime: normalizeDate(s.startTime),
-      endTime: s.endTime ? normalizeDate(s.endTime) : null
-    })
+  if (sessions.length === 0) {
+    return []
   }
-  return out
+
+  const rows = sessions.map((s) => {
+    const id = ensureUuid(s.id)
+    return sessionToRow({ ...s, id }, userId)
+  })
+
+  const { error: insertErr } = await supabase
+    .from('study_sessions')
+    .insert(rows)
+  if (insertErr) throw insertErr
+
+  return sessions.map((s, i) => ({
+    ...s,
+    id: ensureUuid(s.id),
+    startTime: normalizeDate(s.startTime),
+    endTime: s.endTime ? normalizeDate(s.endTime) : null
+  }))
 }
 
 type SubjectRow = {
@@ -130,18 +136,23 @@ export async function replaceAllSubjects(subjects: Subject[]): Promise<Subject[]
   const { error: delErr } = await supabase.from('subjects').delete().eq('user_id', userId)
   if (delErr) throw delErr
 
-  const out: Subject[] = []
-  for (const sub of subjects) {
-    const id = ensureUuid(sub.id)
-    const { error } = await supabase.from('subjects').insert({
-      id,
-      user_id: userId,
-      name: sub.name
-    })
-    if (error) throw error
-    out.push({ id, name: sub.name })
+  if (subjects.length === 0) {
+    return []
   }
-  return out
+
+  const rows = subjects.map((sub) => ({
+    id: ensureUuid(sub.id),
+    user_id: userId,
+    name: sub.name
+  }))
+
+  const { error: insertErr } = await supabase.from('subjects').insert(rows)
+  if (insertErr) throw insertErr
+
+  return subjects.map((sub) => ({
+    id: ensureUuid(sub.id),
+    name: sub.name
+  }))
 }
 
 export async function fetchUserSettings(): Promise<{ reminder_interval: number } | null> {

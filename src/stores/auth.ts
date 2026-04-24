@@ -6,7 +6,8 @@ import { useTimerStore } from './timer'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     session: null as Session | null,
-    user: null as User | null
+    user: null as User | null,
+    initialized: false
   }),
   getters: {
     isLoggedIn: (s) => !!s.session
@@ -16,15 +17,22 @@ export const useAuthStore = defineStore('auth', {
       const { data: { session } } = await supabase.auth.getSession()
       this.session = session
       this.user = session?.user ?? null
-      await useTimerStore().loadAll()
+      
+      if (session && !this.initialized) {
+        await useTimerStore().loadAll()
+      }
+      
+      this.initialized = true
 
       supabase.auth.onAuthStateChange(async (event, session) => {
         console.log('认证状态变化:', { event, session })
         this.session = session
         this.user = session?.user ?? null
         console.log('状态已更新:', { session: this.session, user: this.user, isLoggedIn: !!this.session })
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        if (event === 'SIGNED_IN') {
           await useTimerStore().loadAll()
+        } else if (event === 'SIGNED_OUT') {
+          useTimerStore().$reset()
         }
       })
     },

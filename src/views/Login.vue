@@ -65,11 +65,8 @@ const onSubmit = async () => {
       return
     }
     console.log('登录成功，准备跳转到首页')
-    // 延迟一小段时间确保状态更新完成
-    setTimeout(() => {
-      loading.value = false
-      router.push('/')
-    }, 500)
+    loading.value = false
+    router.push('/')
   } catch (err) {
     console.error('登录异常:', err)
     errorMessage.value = '登录失败，请稍后重试'

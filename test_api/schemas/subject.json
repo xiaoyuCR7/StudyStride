@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Subject Schema",
+  "definitions": {
+    "subject": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "user_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "user_id", "name", "created_at", "updated_at"]
+    },
+    "subject_create": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        }
+      },
+      "required": ["user_id", "name"]
+    },
+    "subject_list": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/subject"
+      }
+    },
+    "error_response": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "hint": {
+              "type": "string"
+            },
+            "details": {
+              "type": ["object", "null"]
+            }
+          },
+          "required": ["code", "message"]
+        }
+      },
+      "required": ["error"]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/subject"
+    },
+    {
+      "$ref": "#/definitions/subject_list"
+    },
+    {
+      "$ref": "#/definitions/error_response"
+    }
+  ]
+}

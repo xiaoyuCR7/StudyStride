@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User Settings Schema",
+  "definitions": {
+    "user_settings": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "reminder_interval": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["user_id", "reminder_interval", "created_at", "updated_at"]
+    },
+    "user_settings_create": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "reminder_interval": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        }
+      },
+      "required": ["user_id", "reminder_interval"]
+    },
+    "error_response": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "hint": {
+              "type": "string"
+            },
+            "details": {
+              "type": ["object", "null"]
+            }
+          },
+          "required": ["code", "message"]
+        }
+      },
+      "required": ["error"]
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/user_settings"
+    },
+    {
+      "$ref": "#/definitions/error_response"
+    }
+  ]
+}

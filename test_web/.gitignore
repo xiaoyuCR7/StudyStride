@@ -13,6 +13,7 @@ allure-results/
 allure-report/
 reports/
 logs/
+videos/
 
 # IDE
 .idea/
