@@ -23,6 +23,6 @@ jobs:
       run: apifox run --access-token $APIFOX_ACCESS_TOKEN -t 8239446 -e 44374114 -d 4231571 -r html,cli
 
     - name: Running Test Scenario2
-      run: apifox run --access-token $APIFOX_ACCESS_TOKEN -t 8225023 -e 44374117 -n 1 -r html,cli
+      run: apifox run --access-token $APIFOX_ACCESS_TOKEN -t 8246304 -e 44374118 -n 1 -r html,cli
 
     
