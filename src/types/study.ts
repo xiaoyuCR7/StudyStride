@@ -1,5 +1,8 @@
 export interface StudySession {
   id: string
+  userId?: string
+  userName?: string
+  userAvatar?: string
   startTime: Date
   endTime: Date | null
   duration: number

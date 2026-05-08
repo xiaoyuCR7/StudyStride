@@ -3,68 +3,175 @@ import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { useTimerStore } from './timer'
 
+const RETRY_DELAY = 1000
+const MAX_RETRIES = 3
+
+async function withRetry<T>(fn: () => Promise<T>, retries: number = MAX_RETRIES): Promise<T> {
+  let lastError: Error | null = null
+  
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn()
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error))
+      console.warn(`操作失败，重试 ${i + 1}/${retries}:`, lastError.message)
+      
+      if (i < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (i + 1)))
+      }
+    }
+  }
+  
+  throw lastError || new Error('操作失败，已达到最大重试次数')
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     session: null as Session | null,
     user: null as User | null,
-    initialized: false
+    initialized: false,
+    isLoading: false
   }),
   getters: {
     isLoggedIn: (s) => !!s.session
   },
   actions: {
     async init() {
-      const { data: { session } } = await supabase.auth.getSession()
-      this.session = session
-      this.user = session?.user ?? null
+      if (this.initialized) return
       
-      if (session && !this.initialized) {
-        await useTimerStore().loadAll()
+      this.isLoading = true
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('初始化会话失败:', error)
+        } else {
+          this.session = session
+          this.user = session?.user ?? null
+          
+          if (session) {
+            try {
+              await useTimerStore().loadAll()
+            } catch (loadError) {
+              console.error('加载用户数据失败:', loadError)
+            }
+          }
+        }
+        
+        supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log('认证状态变化:', { event, session })
+          this.session = session
+          this.user = session?.user ?? null
+          
+          try {
+            if (event === 'SIGNED_IN') {
+              await useTimerStore().loadAll()
+            } else if (event === 'SIGNED_OUT') {
+              useTimerStore().$reset()
+            }
+          } catch (error) {
+            console.error('认证状态变化处理失败:', error)
+          }
+        })
+      } catch (error) {
+        console.error('认证初始化异常:', error)
+      } finally {
+        this.initialized = true
+        this.isLoading = false
+      }
+    },
+    
+    async signIn(email: string, password: string) {
+      if (!email || !password) {
+        return { error: new Error('邮箱和密码不能为空') }
       }
       
-      this.initialized = true
-
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('认证状态变化:', { event, session })
-        this.session = session
-        this.user = session?.user ?? null
-        console.log('状态已更新:', { session: this.session, user: this.user, isLoggedIn: !!this.session })
-        if (event === 'SIGNED_IN') {
-          await useTimerStore().loadAll()
-        } else if (event === 'SIGNED_OUT') {
-          useTimerStore().$reset()
+      this.isLoading = true
+      try {
+        const result = await withRetry(async () => {
+          return await supabase.auth.signInWithPassword({ email, password })
+        })
+        
+        if (result.error) {
+          console.error('登录失败:', result.error)
+          return { error: result.error }
         }
-      })
+        
+        this.session = result.data.session
+        this.user = result.data.user
+        console.log('登录成功:', { session: this.session, user: this.user })
+        
+        try {
+          await useTimerStore().loadAll()
+        } catch (loadError) {
+          console.error('登录后加载数据失败:', loadError)
+        }
+        
+        return { error: null }
+      } catch (error) {
+        console.error('登录异常:', error)
+        return { error: error instanceof Error ? error : new Error('登录失败') }
+      } finally {
+        this.isLoading = false
+      }
     },
-    async signIn(email: string, password: string) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      return { error }
-    },
+    
     async signUp(email: string, password: string) {
-      const { error } = await supabase.auth.signUp({ email, password })
-      return { error }
+      if (!email || !password) {
+        return { error: new Error('邮箱和密码不能为空') }
+      }
+      
+      if (password.length < 6) {
+        return { error: new Error('密码长度至少需要6位') }
+      }
+      
+      this.isLoading = true
+      try {
+        const result = await withRetry(async () => {
+          return await supabase.auth.signUp({ email, password })
+        })
+        
+        if (result.error) {
+          console.error('注册失败:', result.error)
+          return { error: result.error }
+        }
+        
+        this.session = result.data.session
+        this.user = result.data.user
+        console.log('注册成功:', { session: this.session, user: this.user })
+        
+        return { error: null }
+      } catch (error) {
+        console.error('注册异常:', error)
+        return { error: error instanceof Error ? error : new Error('注册失败') }
+      } finally {
+        this.isLoading = false
+      }
     },
+    
     async signOut() {
+      this.isLoading = true
       try {
         console.log('开始执行退出登录')
-        // 先清除本地状态
-        this.session = null
-        this.user = null
-        console.log('本地状态已重置')
         
         const { error } = await supabase.auth.signOut({})
         if (error) {
-          console.error('退出登录失败:', error)
-        } else {
-          console.log('退出登录成功')
+          console.error('退出登录请求失败:', error)
         }
-      } catch (error) {
-        console.error('退出登录异常:', error)
-        // 即使出错也确保状态被重置
+        
         this.session = null
         this.user = null
+        useTimerStore().$reset()
+        
+        console.log('退出登录成功')
+      } catch (error) {
+        console.error('退出登录异常:', error)
+        this.session = null
+        this.user = null
+        useTimerStore().$reset()
+      } finally {
+        this.isLoading = false
       }
-      console.log('退出登录完成，最终状态:', { session: this.session, user: this.user, isLoggedIn: !!this.session })
     }
   }
 })

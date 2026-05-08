@@ -34,9 +34,11 @@ async function getUserId(): Promise<string | null> {
   return user?.id ?? null
 }
 
+//SessionRow类型定义缺少user_avatar字段，需要添加以支持用户头像功能
 type SessionRow = {
   id: string
   user_id: string
+  user_avatar?: string // 添加用户头像字段
   subject: string
   content: string
   duration: number

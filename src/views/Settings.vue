@@ -317,7 +317,7 @@ onMounted(async () => {
 h1 {
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  color: #333;
+  color: var(--text-color);
   text-align: center;
 }
 
@@ -328,16 +328,22 @@ h1 {
 }
 
 .setting-item {
-  background: #f5f5f5;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
 }
 
 h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #333;
+  background: var(--h1-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subject-management {
@@ -353,25 +359,28 @@ h2 {
 .add-subject input {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #f0f0f0;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: #f9f9f9;
+  background: var(--navbar-user-bg);
+  color: var(--text-color);
 }
 
 .add-subject input:focus {
   outline: none;
-  border-color: #4CAF50;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .subjects-list {
-  background: white;
-  border-radius: 8px;
+  background: var(--navbar-user-bg);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--navbar-user-border);
 }
 
 .subject-item {
@@ -379,12 +388,12 @@ h2 {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.3s ease;
+  border-bottom: 1px solid var(--navbar-user-border);
+  transition: all 0.3s ease;
 }
 
 .subject-item:hover {
-  background-color: #f9f9f9;
+  background-color: var(--navbar-item-bg);
 }
 
 .subject-item:last-child {
@@ -393,7 +402,7 @@ h2 {
 
 .subject-name {
   font-size: 1rem;
-  color: #333;
+  color: var(--text-color);
   font-weight: 500;
 }
 
@@ -429,10 +438,11 @@ h2 {
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.6;
   font-style: italic;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 6px;
+  background: var(--glass-bg);
+  border-radius: 8px;
 }
 
 .reminder-setting,
@@ -447,50 +457,51 @@ h2 {
 
 label {
   font-size: 1rem;
-  color: #333;
+  color: var(--text-color);
   min-width: 150px;
   font-weight: 500;
 }
 
 input[type="number"] {
   padding: 0.75rem;
-  border: 2px solid #f0f0f0;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   width: 120px;
   transition: all 0.3s ease;
-  background: #f9f9f9;
+  background: var(--navbar-user-bg);
+  color: var(--text-color);
 }
 
 input[type="number"]:focus {
   outline: none;
-  border-color: #4CAF50;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 button {
   padding: 0.75rem 1.5rem;
-  border: none;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
-  background: #2196F3;
+  background: rgba(156, 39, 176, 0.8);
   color: white;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--button-active-shadow);
   font-weight: 500;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+  box-shadow: var(--button-hover-shadow);
+  opacity: 1;
 }
 
 button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--button-active-shadow);
 }
 
 button.danger {
@@ -498,7 +509,8 @@ button.danger {
 }
 
 .setting-description {
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
   font-size: 0.9rem;
   margin-top: 0.75rem;
   line-height: 1.4;
@@ -538,23 +550,28 @@ button.danger {
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--card-shadow);
   min-width: 350px;
   max-width: 90%;
   max-height: 90%;
   overflow-y: auto;
   animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--card-border);
   cursor: default;
 }
 
 .modal-content h3 {
   margin-bottom: 1.5rem;
-  color: #333;
+  background: var(--h1-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-size: 1.25rem;
   font-weight: 600;
   text-align: center;
@@ -563,24 +580,26 @@ button.danger {
 .modal-content input {
   width: 100%;
   padding: 1rem;
-  border: 2px solid #f0f0f0;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   margin-bottom: 2rem;
   transition: all 0.3s ease;
-  background: #f9f9f9;
+  background: var(--navbar-user-bg);
+  color: var(--text-color);
 }
 
 .modal-content input:focus {
   outline: none;
-  border-color: #4CAF50;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .modal-message {
   margin-bottom: 2rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
   text-align: center;
   line-height: 1.5;
 }
