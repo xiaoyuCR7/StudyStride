@@ -3,6 +3,8 @@ from pages.home_page import HomePage
 from pages.history_page import HistoryPage
 from pages.settings_page import SettingsPage
 from pages.community_page import CommunityPage
+from pages.login_page import LoginPage
+import time
 from playwright.sync_api import Page
 from utils.logger import get_logger
 
