@@ -53,7 +53,7 @@ class LoginPage(BasePage):
         """检查登录是否成功（通过检查导航栏中是否有用户菜单）"""
         self.page.wait_for_load_state("networkidle")
         time.sleep(4)
-        return self.page.is_visible("button.user-menu-trigger no-avatar")
+        return self.page.is_visible("button.user-menu-trigger.no-avatar")
     
     def go_back(self):
         """返回首页"""
