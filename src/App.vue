@@ -10,12 +10,10 @@
       <div class="navbar-menu">
         <router-link to="/" class="navbar-item">首页</router-link>
         <router-link to="/history" class="navbar-item">历史记录</router-link>
-        <router-link to="/settings" class="navbar-item">设置</router-link>
+        <router-link to="/community" class="navbar-item">学习社区</router-link>
+        <router-link v-if="!auth.isLoggedIn" to="/settings" class="navbar-item">设置</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/login" class="navbar-item">登录</router-link>
-        <span v-else class="navbar-user">
-          <span class="navbar-email">{{ auth.user?.email }}</span>
-          <button type="button" class="logout-btn" @click="logout">退出</button>
-        </span>
+        <UserMenu v-else />
         <button type="button" class="theme-toggle" @click="toggleTheme">
           <span v-if="isLightTheme">🌙</span>
           <span v-else>☀️</span>
@@ -35,6 +33,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from './stores/auth'
 import logo from './assets/logo.png'
+import UserMenu from './components/UserMenu.vue'
 
 const auth = useAuthStore()
 const isLightTheme = ref(false)
@@ -60,18 +59,7 @@ onMounted(() => {
   }
 })
 
-const logout = async () => {
-  console.log('退出按钮被点击')
-  console.log('当前认证状态:', auth.isLoggedIn)
-  console.log('当前用户:', auth.user)
-  
-  try {
-    await auth.signOut()
-    console.log('退出登录调用完成')
-  } catch (error) {
-    console.error('退出登录失败:', error)
-  }
-}
+
 </script>
 
 <style>

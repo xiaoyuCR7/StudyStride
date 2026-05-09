@@ -23,6 +23,26 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../views/Login.vue')
+    },
+    {
+      path: '/community',
+      name: 'community',
+      component: () => import('../views/Community.vue')
+    },
+    {
+      path: '/community/post/:id',
+      name: 'post-detail',
+      component: () => import('../views/PostDetail.vue')
+    },
+    {
+      path: '/community/post/create',
+      name: 'create-post',
+      component: () => import('../views/CreatePost.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileSettings.vue')
     }
   ]
 })

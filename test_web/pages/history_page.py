@@ -6,40 +6,33 @@ class HistoryPage(BasePage):
     
     def __init__(self, page: Page):
         super().__init__(page)
-        # 筛选相关
         self.date_filter = "input[type='date']"
         self.show_all_button = "button:has-text('显示全部')"
-        self.subject_filter = "select[id='subjectFilter']"
-        
-        # 记录相关
+        self.subject_filter = "select#subjectFilter"
         self.session_items = ".session-item"
         self.edit_buttons = ".edit-btn"
         self.delete_buttons = ".delete-btn"
-        
-        # 编辑弹窗相关
-        self.edit_modal = ".modal:has-text('编辑学习记录')"
+        self.edit_modal = ".modal:has(h3:has-text('编辑学习记录'))"
         self.edit_subject_select = "#editSubject"
         self.edit_hours_input = "input[placeholder='小时']"
         self.edit_minutes_input = "input[placeholder='分钟']"
         self.edit_content_input = "#editContent"
-        self.save_edit_button = "button:has-text('保存')"
-        self.cancel_edit_button = "button:has-text('取消')"
-        
-        # 删除弹窗相关
-        self.delete_modal = ".modal:has-text('确认删除')"
-        self.confirm_delete_button = "button.danger"
-        self.cancel_delete_button = "button:has-text('取消')"
-        
-        # 提示消息
-        self.toast_message = ".modal"
+        self.save_edit_button = ".modal:has(h3:has-text('编辑学习记录')) button:has-text('保存')"
+        self.cancel_edit_button = ".modal:has(h3:has-text('编辑学习记录')) button:has-text('取消')"
+        self.delete_modal = ".modal:has(h3:has-text('确认删除'))"
+        self.confirm_delete_button = ".modal:has(h3:has-text('确认删除')) button.danger"
+        self.cancel_delete_button = ".modal:has(h3:has-text('确认删除')) button:has-text('取消')"
+        self.toast_modal = ".modal:has(.toast)"
+        self.toast_message = ".toast-message"
+        self.stats_container = ".stats-container"
+        self.chart_container = ".chart-container"
+        self.sessions_list = ".sessions-list"
+        self.empty_state = ".empty-state"
     
     def wait_for_load(self):
         """等待页面加载完成"""
         super().wait_for_load()
-        # 等待会话项加载完成
-        import time
-        time.sleep(1)
-        
+    
     def wait_for_sessions(self, timeout: int = 10):
         """等待会话项出现"""
         import time
@@ -48,7 +41,6 @@ class HistoryPage(BasePage):
             if self.get_session_count() > 0:
                 return
             time.sleep(0.5)
-        # 如果超时，仍然继续执行，不抛出异常
     
     def filter_by_date(self, date: str):
         """按日期筛选"""
@@ -103,5 +95,23 @@ class HistoryPage(BasePage):
     
     def get_toast_message(self) -> str:
         """获取提示消息"""
-        self.wait_for_selector(self.toast_message)
-        return self.get_text(self.toast_message)
+        if self.is_visible(self.toast_modal):
+            return self.get_text(self.toast_message)
+        return ""
+    
+    def is_empty_state(self) -> bool:
+        """检查是否为空状态"""
+        return self.is_visible(self.empty_state)
+    
+    def get_empty_state_text(self) -> str:
+        """获取空状态文本"""
+        return self.get_text(self.empty_state)
+    
+    def get_subject_tag(self, session_index: int) -> str:
+        """获取指定会话的科目标签"""
+        session_items = self.page.locator(self.session_items).all()
+        if session_index < len(session_items):
+            subject_tag = session_items[session_index].locator(".subject-tag")
+            if subject_tag.is_visible():
+                return subject_tag.inner_text()
+        return ""

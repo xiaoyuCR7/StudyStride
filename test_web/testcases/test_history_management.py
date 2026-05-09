@@ -17,10 +17,9 @@ class TestHistoryManagement:
         """测试快速记录功能"""
         logger.info("开始测试快速记录功能")
         home_page = HomePage(page)
-        history_page = HistoryPage(page)
         
         with allure_helper.step("快速记录学习会话"):
-            test_subject = "未分类"
+            test_subject = f"快速记录科目_{int(datetime.now().timestamp())}"
             logger.debug(f"快速记录科目: {test_subject}")
             home_page.quick_record_session(test_subject, "1", "30", "测试快速记录功能")
             allure_helper.attach_screenshot(page, "快速记录会话")
@@ -31,6 +30,7 @@ class TestHistoryManagement:
         
         with allure_helper.step("导航到历史记录页面"):
             page.click("a:has-text('历史记录')")
+            history_page = HistoryPage(page)
             history_page.wait_for_load()
             history_page.wait_for_sessions()
             allure_helper.attach_screenshot(page, "历史记录页面")
@@ -48,7 +48,8 @@ class TestHistoryManagement:
         history_page = HistoryPage(page)
         
         with allure_helper.step("创建一条记录"):
-            home_page.quick_record_session("未分类", "0", "30", "测试历史记录管理")
+            test_subject = f"编辑测试科目_{int(datetime.now().timestamp())}"
+            home_page.quick_record_session(test_subject, "0", "30", "测试历史记录管理")
             allure_helper.attach_screenshot(page, "创建记录")
         
         with allure_helper.step("等待会话保存完成"):
@@ -58,16 +59,17 @@ class TestHistoryManagement:
         with allure_helper.step("导航到历史记录页面"):
             page.click("a:has-text('历史记录')")
             history_page.wait_for_load()
-            # 等待会话项出现
             history_page.wait_for_sessions()
             allure_helper.attach_screenshot(page, "历史记录页面")
         
         with allure_helper.step("编辑第一条记录"):
             history_page.edit_session(0)
             allure_helper.attach_screenshot(page, "编辑记录")
-            history_page.save_edit("未分类", "1", "0", "编辑后的内容")
+            history_page.save_edit(test_subject, "1", "0", "编辑后的内容")
         
         with allure_helper.step("检查提示消息"):
+            import time
+            time.sleep(1)
             toast_message = history_page.get_toast_message()
             allure_helper.attach_text(toast_message, "提示消息")
             assert "学习记录已更新成功" in toast_message
@@ -78,7 +80,8 @@ class TestHistoryManagement:
         history_page = HistoryPage(page)
         
         with allure_helper.step("创建一条记录"):
-            home_page.quick_record_session("未分类", "0", "30", "测试删除功能")
+            test_subject = f"删除测试科目_{int(datetime.now().timestamp())}"
+            home_page.quick_record_session(test_subject, "0", "30", "测试删除功能")
             allure_helper.attach_screenshot(page, "创建记录")
         
         with allure_helper.step("等待会话保存完成"):
@@ -88,7 +91,6 @@ class TestHistoryManagement:
         with allure_helper.step("导航到历史记录页面"):
             page.click("a:has-text('历史记录')")
             history_page.wait_for_load()
-            # 等待会话项出现
             history_page.wait_for_sessions()
             allure_helper.attach_screenshot(page, "历史记录页面")
         
@@ -103,6 +105,8 @@ class TestHistoryManagement:
             history_page.confirm_delete()
         
         with allure_helper.step("检查记录数量是否减少"):
+            import time
+            time.sleep(1)
             final_count = history_page.get_session_count()
             allure_helper.attach_text(f"删除后会话数量: {final_count}", "删除后会话数量")
             assert final_count == initial_count - 1
@@ -119,7 +123,7 @@ class TestHistoryManagement:
         
         with allure_helper.step("创建一条记录"):
             today = datetime.now().strftime("%Y-%m-%d")
-            home_page.quick_record_session("未分类", "0", "10", "今天的记录")
+            home_page.quick_record_session("日期筛选测试", "0", "10", "今天的记录")
             allure_helper.attach_screenshot(page, "创建记录")
         
         with allure_helper.step("等待会话保存完成"):
@@ -129,7 +133,6 @@ class TestHistoryManagement:
         with allure_helper.step("导航到历史记录页面"):
             page.click("a:has-text('历史记录')")
             history_page.wait_for_load()
-            # 等待会话项出现
             history_page.wait_for_sessions()
             allure_helper.attach_screenshot(page, "历史记录页面")
         
@@ -138,6 +141,8 @@ class TestHistoryManagement:
             allure_helper.attach_screenshot(page, "按日期筛选")
         
         with allure_helper.step("检查筛选后是否有记录"):
+            import time
+            time.sleep(1)
             filtered_count = history_page.get_session_count()
             allure_helper.attach_text(f"筛选后会话数量: {filtered_count}", "筛选后会话数量")
             assert filtered_count > 0

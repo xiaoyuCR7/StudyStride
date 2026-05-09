@@ -15,7 +15,7 @@ class TestTimerFunctionality:
         logger.info("测试计时器的开始、暂停、继续和结束功能")
         home_page = HomePage(page)
         
-        home_page.start_timer()
+        home_page.start_timer("测试科目")
         logger.debug("开始计时")
         time.sleep(2)
         
@@ -50,7 +50,7 @@ class TestTimerFunctionality:
         logger.info("测试计时器显示格式是否正确")
         home_page = HomePage(page)
         
-        home_page.start_timer()
+        home_page.start_timer("测试科目")
         logger.debug("开始计时")
         time.sleep(1)
         
@@ -62,3 +62,36 @@ class TestTimerFunctionality:
         
         home_page.stop_timer()
         logger.info("计时器显示格式测试成功")
+    
+    def test_timer_state_checks(self, page: Page):
+        """测试计时器状态检查功能"""
+        logger.info("测试计时器状态检查功能")
+        home_page = HomePage(page)
+        
+        assert not home_page.is_timer_running()
+        assert not home_page.is_timer_paused()
+        logger.debug("初始状态验证")
+        
+        home_page.start_timer("测试科目")
+        time.sleep(1)
+        
+        assert home_page.is_timer_running()
+        assert not home_page.is_timer_paused()
+        logger.debug("运行状态验证")
+        
+        home_page.pause_timer()
+        time.sleep(0.5)
+        
+        assert not home_page.is_timer_running()
+        assert home_page.is_timer_paused()
+        logger.debug("暂停状态验证")
+        
+        home_page.continue_timer()
+        time.sleep(0.5)
+        
+        assert home_page.is_timer_running()
+        assert not home_page.is_timer_paused()
+        logger.debug("继续运行状态验证")
+        
+        home_page.stop_timer()
+        logger.info("计时器状态检查测试成功")

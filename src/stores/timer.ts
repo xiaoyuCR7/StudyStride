@@ -84,8 +84,12 @@ export const useTimerStore = defineStore('timer', {
     },
 
     removeSubject(id: string) {
-      this.subjects = this.subjects.filter((subject) => subject.id !== id)
-      void this.saveSubjects()
+      const subject = this.subjects.find((s) => s.id === id)
+      if (subject) {
+        this.subjects = this.subjects.filter((s) => s.id !== id)
+        this.sessions = this.sessions.filter((s) => s.subject !== subject.name)
+        void Promise.all([this.saveSubjects(), this.saveSessions()])
+      }
     },
 
     updateSubject(id: string, name: string): { success: boolean; message: string } {

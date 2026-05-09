@@ -37,6 +37,14 @@
         </div>
       </div>
       
+      <!-- 学习时长图表 -->
+      <div class="chart-container">
+        <h2>学习时长趋势</h2>
+        <div class="chart-wrapper">
+          <Bar :data="chartData" :options="chartOptions" />
+        </div>
+      </div>
+      
       <div class="sessions-list">
         <h2>{{ displayDate }} 的学习记录</h2>
         <div v-if="filteredSessions.length === 0" class="empty-state">
@@ -45,6 +53,7 @@
         <div v-else class="session-item" v-for="session in filteredSessions" :key="session.id">
           <div class="session-header">
             <div class="session-time">
+              <span v-if="isShowingAll" class="session-date">{{ formatSessionDate(session) }}</span>
               <span class="start-time">{{ formatTime(session.startTime) }}</span>
               <span class="duration">{{ formatDuration(session.duration) }}</span>
             </div>
@@ -121,6 +130,25 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useTimerStore } from '../stores/timer'
+import { Bar } from 'vue-chartjs'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 const store = useTimerStore()
 const selectedDate = ref(new Date().toISOString().split('T')[0])
@@ -155,6 +183,21 @@ const displayDate = computed(() => {
   })
 })
 
+// 是否显示全部学习记录
+const isShowingAll = computed(() => {
+  return !selectedDate.value
+})
+
+// 格式化每条学习记录的日期
+const formatSessionDate = (session: any) => {
+  if (!session.date) return ''
+  const date = new Date(session.date)
+  return date.toLocaleDateString('zh-CN', {
+    month: '2-digit',
+    day: '2-digit'
+  })
+}
+
 const subjects = computed(() => store.subjects)
 
 // 计算本周总学习时长
@@ -184,6 +227,132 @@ const monthTotalTime = computed(() => {
 // 计算所有时间总学习时长
 const totalTotalTime = computed(() => {
   return store.sessions.reduce((total, session) => total + session.duration, 0)
+})
+
+// 生成最近7天的日期数组
+const getLast7Days = (): string[] => {
+  const days: string[] = []
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0]
+    if (dateStr) {
+      days.push(dateStr)
+    }
+  }
+  return days
+}
+
+// 计算每天的学习时长（分钟）
+const dailyStudyMinutes = computed(() => {
+  const days = getLast7Days()
+  const minutesByDate: Record<string, number> = {}
+  
+  days.forEach(day => {
+    minutesByDate[day] = 0
+  })
+  
+  store.sessions.forEach(session => {
+    const date = session.date as string
+    if (date && days.includes(date)) {
+      if (!minutesByDate[date]) {
+        minutesByDate[date] = 0
+      }
+      minutesByDate[date] += Math.floor(session.duration / 60)
+    }
+  })
+  
+  return days.map(day => minutesByDate[day] || 0)
+})
+
+// 格式化日期显示 - 显示周几和日期
+const formatDateLabel = (dateStr: string): string => {
+  const date = new Date(dateStr)
+  const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+  const weekDay = weekDays[date.getDay()] || ''
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  return `${weekDay}\n${month}/${day}`
+}
+
+// 获取当前主题模式
+const isLightMode = computed(() => {
+  return document.documentElement.classList.contains('light')
+})
+
+// 图表数据
+const chartData = computed(() => ({
+  labels: getLast7Days().map(formatDateLabel),
+  datasets: [
+    {
+      label: '学习时长（分钟）',
+      data: dailyStudyMinutes.value,
+      backgroundColor: 'rgba(156, 39, 176, 0.6)',
+      borderColor: 'rgba(156, 39, 176, 1)',
+      borderWidth: 1,
+      borderRadius: 8,
+      barThickness: 30
+    }
+  ]
+}))
+
+// 图表配置
+const chartOptions = computed(() => {
+  const textColor = isLightMode.value ? 'rgba(45, 55, 72, 0.8)' : 'rgba(255, 255, 255, 0.8)'
+  const gridColor = isLightMode.value ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.1)'
+  const tickColor = isLightMode.value ? 'rgba(45, 55, 72, 0.6)' : 'rgba(255, 255, 255, 0.7)'
+  
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top' as const,
+        labels: {
+          color: textColor,
+          font: {
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 8
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          color: gridColor
+        },
+        ticks: {
+          color: tickColor,
+          callback: function(value: number | string, index: number) {
+            const labels = getLast7Days().map(formatDateLabel)
+            if (typeof value === 'number' && labels[index]) {
+              const parts = labels[index].split('\n')
+              return parts
+            }
+            return ''
+          }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: gridColor
+        },
+        ticks: {
+          color: tickColor,
+          callback: (value: number | string) => `${value}分钟`
+        }
+      }
+    }
+  }
 })
 
 const filterSessions = () => {
@@ -345,7 +514,7 @@ onMounted(async () => {
 h1 {
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  color: #333;
+  color: var(--text-color);
   text-align: center;
 }
 
@@ -405,10 +574,30 @@ button:hover {
 }
 
 .stats-container {
-  background: #f5f5f5;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 10px;
+  border-radius: 16px;
   margin-bottom: 2rem;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+.chart-container {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+.chart-wrapper {
+  height: 300px;
+  position: relative;
 }
 
 .stats-grid {
@@ -419,22 +608,25 @@ button:hover {
 }
 
 .stats-container .stat-item {
-  background: white;
+  background: var(--navbar-user-bg);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   padding: 1.5rem;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
+  border: 1px solid var(--navbar-user-border);
+  transition: all 0.3s ease;
 }
 
 .stats-container .stat-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--navbar-item-shadow);
 }
 
 .stats-container .stat-item h3 {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
   margin-bottom: 0.75rem;
   font-weight: 500;
 }
@@ -442,33 +634,46 @@ button:hover {
 .stats-container .stat-item .stat-value {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #4CAF50;
+  background: var(--h1-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .sessions-list {
-  background: #f5f5f5;
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 10px;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
 }
 
 h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #333;
+  background: var(--h1-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 .session-item {
-  background: white;
+  background: var(--navbar-user-bg);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   padding: 1.5rem;
-  border-radius: 5px;
+  border-radius: 12px;
   margin-bottom: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--navbar-user-border);
 }
 
 .session-header {
@@ -484,7 +689,7 @@ h2 {
   display: flex;
   gap: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: var(--text-color);
 }
 
 .session-actions {
@@ -495,6 +700,17 @@ h2 {
 
 .session-subject {
   margin-left: auto;
+}
+
+.session-date {
+  background: var(--h1-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 0.9rem;
+  padding-right: 0.5rem;
+  border-right: 2px solid var(--card-border);
+  margin-right: 0.5rem;
 }
 
 .subject-tag {
@@ -549,23 +765,28 @@ h2 {
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   padding: 2rem;
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--card-shadow);
   min-width: 450px;
   max-width: 90%;
   max-height: 90%;
   overflow-y: auto;
   animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--card-border);
   cursor: default;
 }
 
 .modal-content h3 {
   margin-bottom: 2rem;
-  color: #333;
+  background: var(--h1-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-size: 1.25rem;
   font-weight: 600;
   text-align: center;
@@ -573,7 +794,8 @@ h2 {
 
 .modal-message {
   margin-bottom: 2rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
   text-align: center;
   line-height: 1.5;
 }
@@ -587,26 +809,27 @@ h2 {
 
 .form-group label {
   font-size: 1rem;
-  color: #333;
+  color: var(--text-color);
   font-weight: 600;
 }
 
 .form-group select,
 .form-group textarea {
   padding: 1rem;
-  border: 2px solid #f0f0f0;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: #f9f9f9;
+  background: var(--navbar-user-bg);
+  color: var(--text-color);
 }
 
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4CAF50;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .form-group textarea {
@@ -622,26 +845,27 @@ h2 {
 
 .duration-inputs input {
   padding: 1rem;
-  border: 2px solid #f0f0f0;
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-size: 1rem;
   width: 120px;
   text-align: center;
   transition: all 0.3s ease;
-  background: #f9f9f9;
+  background: var(--navbar-user-bg);
+  color: var(--text-color);
 }
 
 .duration-inputs input:focus {
   outline: none;
-  border-color: #4CAF50;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: var(--primary-light);
+  background: var(--glass-bg);
+  box-shadow: var(--button-hover-shadow);
 }
 
 .duration-inputs .separator {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #333;
+  color: var(--text-color);
 }
 
 .modal-buttons {
@@ -772,12 +996,14 @@ button.danger {
 }
 
 .session-content {
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
   line-height: 1.5;
 }
 
 .session-content.empty {
   font-style: italic;
-  color: #999;
+  color: var(--text-color);
+  opacity: 0.5;
 }
 </style>
