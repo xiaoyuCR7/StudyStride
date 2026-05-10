@@ -1,14 +1,14 @@
 <template>
-  <div class="app">
-    <nav class="navbar">
+  <div class="app" :class="{ 'hide-navbar': isHomePage }">
+    <nav v-if="!isHomePage" class="navbar">
       <div class="navbar-brand">
-        <router-link to="/" class="brand-link">
+        <router-link to="/study" class="brand-link">
           <img :src="logo" alt="StudyStride" class="brand-logo" />
           <span class="brand-name">StudyStride</span>
         </router-link>
       </div>
       <div class="navbar-menu">
-        <router-link to="/" class="navbar-item">首页</router-link>
+        <router-link to="/study" class="navbar-item">首页</router-link>
         <router-link to="/history" class="navbar-item">历史记录</router-link>
         <router-link to="/community" class="navbar-item">学习社区</router-link>
         <router-link v-if="!auth.isLoggedIn" to="/settings" class="navbar-item">设置</router-link>
@@ -21,24 +21,53 @@
       </div>
     </nav>
     <main class="main-content">
-      <router-view />
+      <div v-if="!isHomePage" class="main-content__bg" aria-hidden="true">
+        <video
+          class="main-content__bg-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          :src="heroVideoSrc"
+          @error="onHeroVideoError"
+        />
+        <div class="main-content__bg-noise" />
+        <div class="main-content__bg-gradient" />
+      </div>
+      <div class="main-content__body">
+        <router-view />
+      </div>
     </main>
-    <footer class="footer">
+    <footer v-if="!isHomePage" class="footer">
       <p>&copy; {{ new Date().getFullYear() }} StudyStride - 学习打卡应用</p>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
+import { HERO_VIDEO_CDN, heroVideoLocalUrl } from './lib/heroBackgroundVideo'
 import logo from './assets/logo.png'
 import UserMenu from './components/UserMenu.vue'
 
+const route = useRoute()
 const auth = useAuthStore()
 const isLightTheme = ref(false)
 
-// 主题切换函数
+const heroVideoSrc = ref(heroVideoLocalUrl())
+let heroVideoFallbackTried = false
+
+const onHeroVideoError = () => {
+  if (!heroVideoFallbackTried && heroVideoSrc.value !== HERO_VIDEO_CDN) {
+    heroVideoFallbackTried = true
+    heroVideoSrc.value = HERO_VIDEO_CDN
+  }
+}
+
+const isHomePage = computed(() => route.path === '/')
+
 const toggleTheme = () => {
   isLightTheme.value = !isLightTheme.value
   if (isLightTheme.value) {
@@ -70,8 +99,9 @@ onMounted(() => {
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Almarai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--background-gradient);
+  background-color: var(--background-color);
   color: var(--text-color);
   line-height: 1.6;
   min-height: 100vh;
@@ -82,24 +112,96 @@ body {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.main-content__bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.main-content__bg-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  transform: translate(-50%, -50%) scale(1);
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.main-content__bg-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.main-content__bg-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent 42%, rgba(0, 0, 0, 0.6));
+}
+
+:root.light .main-content__bg-video {
+  opacity: 0.28;
+}
+
+:root.light .main-content__bg-noise {
+  opacity: 0.35;
+}
+
+:root.light .main-content__bg-gradient {
+  background: linear-gradient(
+    to bottom,
+    rgba(244, 243, 235, 0.72),
+    rgba(244, 243, 235, 0.55) 40%,
+    rgba(244, 243, 235, 0.82)
+  );
 }
 
 .navbar {
+  position: relative;
+  z-index: 10;
   background: var(--navbar-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--navbar-border);
   color: var(--text-color);
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: var(--navbar-shadow);
   transition: all 0.3s ease;
+  border-radius: 0 0 1.25rem 1.25rem;
 }
 
 .navbar:hover {
   box-shadow: var(--navbar-hover-shadow);
+}
+
+.app.hide-navbar {
+  min-height: 100vh;
+}
+
+.app.hide-navbar .main-content {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+  min-height: 100vh;
 }
 
 .navbar-brand .brand-link {
@@ -137,19 +239,22 @@ body {
 }
 
 .navbar-item {
-  color: var(--text-color);
+  color: var(--nav-link);
   text-decoration: none;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
   position: relative;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
 }
 
-.navbar-item:hover {
-  color: var(--text-color);
+.navbar-item:hover,
+.navbar-item.router-link-active {
+  color: var(--nav-link-hover);
   background: var(--navbar-item-bg);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--navbar-item-shadow);
 }
 
@@ -237,13 +342,51 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.main-content__body {
+  position: relative;
+  z-index: 2;
+  min-height: 100%;
+}
+
+.main-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 90% 65% at 50% -15%,
+    rgba(225, 224, 204, 0.06) 0%,
+    transparent 52%
+  );
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    padding: 1.5rem 1.75rem 3rem;
+  }
+}
+
+:root.light .main-content::before {
+  background: radial-gradient(
+    ellipse 90% 60% at 50% -10%,
+    rgba(42, 41, 34, 0.05) 0%,
+    transparent 50%
+  );
 }
 
 .footer {
+  position: relative;
+  z-index: 10;
   background: var(--footer-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -269,7 +412,7 @@ body {
   }
   
   .main-content {
-    padding: 1rem;
+    padding: 0.875rem 1rem 2rem;
   }
   
   .navbar-user {
