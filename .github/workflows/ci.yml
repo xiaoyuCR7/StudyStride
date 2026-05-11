@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: frontend-build
     env:
-      BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:5173' }}
+      BASE_URL: ${{ secrets.BASE_URL || 'http://localhost:5173/StudyStride/#/study' }}
       BROWSER: 'chromium'
       HEADLESS: 'true'
     steps:

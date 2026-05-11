@@ -1,99 +1,164 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Almarai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  /* 主题变量 - 默认暗色模式 */
-  --primary-color: #9c27b0;
-  --primary-light: #d500f9;
-  --primary-dark: #6a0080;
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  --text-color: rgba(255, 255, 255, 0.87);
-  --background-color: #1a1a2e;
-  --background-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  --navbar-bg: rgba(255, 255, 255, 0.1);
-  --navbar-border: rgba(255, 255, 255, 0.2);
-  --navbar-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  --footer-bg: rgba(255, 255, 255, 0.1);
-  --footer-border: rgba(255, 255, 255, 0.2);
-  --footer-shadow: 0 -8px 32px 0 rgba(31, 38, 135, 0.37);
-  --card-bg: rgba(255, 255, 255, 0.1);
-  --card-border: rgba(255, 255, 255, 0.2);
-  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  --navbar-item-bg: rgba(156, 39, 176, 0.2);
-  --navbar-item-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
-  --navbar-user-bg: rgba(255, 255, 255, 0.05);
-  --navbar-user-border: rgba(255, 255, 255, 0.1);
-  --logout-btn-bg: rgba(255, 255, 255, 0.1);
-  --logout-btn-border: rgba(255, 255, 255, 0.2);
-  --logout-btn-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
-  --h1-gradient: linear-gradient(45deg, #d500f9, #9c27b0);
-  --button-hover-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
-  --button-active-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.3);
-  --card-hover-shadow: 0 16px 48px 0 rgba(156, 39, 176, 0.4);
-  --navbar-hover-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.4);
+
+  /* Prisma-inspired dark / warm cream (see public/p.md) */
+  --cream: #dedbc8;
+  --cream-bright: #e1e0cc;
+  --cream-dim: rgba(225, 224, 204, 0.72);
+  --cream-muted: #9a9888;
+  --surface-deep: #000000;
+  --surface-card: #101010;
+  --surface-elevated: #212121;
+
+  --primary-color: var(--cream);
+  --primary-light: var(--cream-bright);
+  --primary-dark: #a8a591;
+  --glass-bg: rgba(16, 16, 16, 0.65);
+  --glass-border: rgba(225, 224, 204, 0.12);
+  --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+  --text-color: var(--cream-bright);
+  --text-muted: var(--cream-muted);
+  --background-color: var(--surface-deep);
+  --background-gradient: #000000;
+  --navbar-bg: rgba(0, 0, 0, 0.92);
+  --navbar-border: rgba(225, 224, 204, 0.1);
+  --navbar-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  --footer-bg: rgba(0, 0, 0, 0.88);
+  --footer-border: rgba(225, 224, 204, 0.1);
+  --footer-shadow: 0 -12px 48px rgba(0, 0, 0, 0.45);
+  --card-bg: var(--surface-card);
+  --card-border: rgba(225, 224, 204, 0.1);
+  --card-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  --navbar-item-bg: rgba(225, 224, 204, 0.06);
+  --navbar-item-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  --navbar-user-bg: rgba(33, 33, 33, 0.6);
+  --navbar-user-border: rgba(225, 224, 204, 0.08);
+  --logout-btn-bg: rgba(33, 33, 33, 0.75);
+  --logout-btn-border: rgba(225, 224, 204, 0.12);
+  --logout-btn-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --h1-gradient: linear-gradient(120deg, #e1e0cc 0%, #c4c2a8 100%);
+  --button-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --button-active-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --card-hover-shadow: 0 20px 56px rgba(0, 0, 0, 0.5);
+  --navbar-hover-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  --input-fg: var(--cream);
+  --cta-bg: var(--cream);
+  --cta-text: #0a0a0a;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --nav-link: rgba(225, 224, 204, 0.82);
+  --nav-link-hover: var(--cream-bright);
+
+  /* Glow card variables - Dark mode (Blue to Light Red) */
+  --glow-gradient: linear-gradient(137deg, #4361EE 0%, #E0AEFF 45%, #FF3D77 100%);
+  --border-gradient: linear-gradient(137deg, #4361EE 0%, #E0AEFF 45%, #FF3D77 100%);
+  --card-bg-inner: #1A1A1C;
 }
 
-/* 白天模式 */
+/* Light mode: warm paper, still readable */
 :root.light {
-  --primary-color: #9c27b0;
-  --primary-light: #d500f9;
-  --primary-dark: #6a0080;
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-  --text-color: #2d3748;
-  --background-color: #e8e8e8;
-  --background-gradient: linear-gradient(135deg, #e8e8e8 0%, #d4d4d4 100%);
-  --navbar-bg: rgba(255, 255, 255, 0.95);
-  --navbar-border: rgba(0, 0, 0, 0.1);
-  --navbar-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-  --footer-bg: rgba(255, 255, 255, 0.95);
-  --footer-border: rgba(0, 0, 0, 0.1);
-  --footer-shadow: 0 -8px 32px 0 rgba(0, 0, 0, 0.1);
-  --card-bg: rgba(255, 255, 255, 0.95);
-  --card-border: rgba(0, 0, 0, 0.1);
-  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-  --navbar-item-bg: rgba(156, 39, 176, 0.1);
-  --navbar-item-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.2);
-  --navbar-user-bg: rgba(0, 0, 0, 0.02);
-  --navbar-user-border: rgba(0, 0, 0, 0.08);
-  --logout-btn-bg: rgba(0, 0, 0, 0.02);
+  --cream: #3d3c34;
+  --cream-bright: #2a2922;
+  --cream-dim: rgba(42, 41, 34, 0.75);
+  --cream-muted: #6b6a62;
+  --surface-deep: #f0efe6;
+  --surface-card: #ffffff;
+  --surface-elevated: #e8e6dc;
+
+  --primary-color: #4a4638;
+  --primary-light: #2a2922;
+  --primary-dark: #6b6558;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --text-color: #2a2922;
+  --text-muted: #6b6a62;
+  --background-color: #ebeae1;
+  --background-gradient: linear-gradient(165deg, #f4f3eb 0%, #e5e3d8 100%);
+  --navbar-bg: rgba(255, 255, 255, 0.92);
+  --navbar-border: rgba(0, 0, 0, 0.08);
+  --navbar-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --footer-bg: rgba(255, 255, 255, 0.92);
+  --footer-border: rgba(0, 0, 0, 0.08);
+  --footer-shadow: 0 -8px 32px rgba(0, 0, 0, 0.06);
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --navbar-item-bg: rgba(0, 0, 0, 0.04);
+  --navbar-item-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --navbar-user-bg: rgba(0, 0, 0, 0.03);
+  --navbar-user-border: rgba(0, 0, 0, 0.06);
+  --logout-btn-bg: rgba(255, 255, 255, 0.9);
   --logout-btn-border: rgba(0, 0, 0, 0.1);
-  --logout-btn-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.2);
-  --h1-gradient: linear-gradient(45deg, #6a0080, #9c27b0);
-  --button-hover-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.3);
-  --button-active-shadow: 0 4px 16px 0 rgba(156, 39, 176, 0.2);
-  --card-hover-shadow: 0 16px 48px 0 rgba(156, 39, 176, 0.3);
-  --navbar-hover-shadow: 0 12px 40px 0 rgba(156, 39, 176, 0.3);
+  --logout-btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --h1-gradient: linear-gradient(120deg, #2a2922 0%, #5c5748 100%);
+  --button-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  --button-active-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --card-hover-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+  --navbar-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  --input-fg: #3d3c34;
+  --cta-bg: #2a2922;
+  --cta-text: #f4f3eb;
+  --nav-link: rgba(42, 41, 34, 0.72);
+  --nav-link-hover: #1a1915;
+
+  /* Glow card variables - Light mode (Blue to Light Red) */
+  --glow-gradient: linear-gradient(137deg, #4361EE 0%, #7DD3FC 45%, #FF3D77 100%);
+  --border-gradient: linear-gradient(137deg, #4361EE 0%, #7DD3FC 45%, #FF3D77 100%);
+  --card-bg-inner: #ffffff;
 }
 
 a {
   font-weight: 500;
-  color: var(--primary-light);
+  color: var(--cream-dim);
   text-decoration: inherit;
-  transition: all 0.3s ease;
+  transition: color 0.25s ease, transform 0.25s ease;
 }
+
 a:hover {
-  color: var(--text-color);
-  transform: translateY(-2px);
+  color: var(--cream-bright);
+  transform: translateY(-1px);
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: 'Almarai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--background-gradient);
+  background-color: var(--background-color);
   color: var(--text-color);
+  position: relative;
+}
+
+/* Subtle film grain (p.md Features .bg-noise) */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+:root.light body::after {
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 h1 {
@@ -106,76 +171,52 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1px solid var(--glass-border);
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--surface-elevated);
   color: var(--text-color);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition:
+    border-color 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
   box-shadow: var(--glass-shadow);
 }
+
 button:hover {
-  border-color: var(--primary-light);
-  transform: translateY(-3px);
+  border-color: rgba(225, 224, 204, 0.28);
+  transform: translateY(-2px);
   box-shadow: var(--button-hover-shadow);
 }
+
 button:active {
-  transform: translateY(1px);
+  transform: translateY(0);
   box-shadow: var(--button-active-shadow);
 }
+
 button:focus,
 button:focus-visible {
-  outline: 2px solid var(--primary-light);
+  outline: 2px solid var(--cream);
   outline-offset: 2px;
 }
 
 .card {
   padding: 2em;
   background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
+  border-radius: 1rem;
   border: 1px solid var(--card-border);
   box-shadow: var(--card-shadow);
-  transition: all 0.3s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   box-shadow: var(--card-hover-shadow);
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #f8f9fa;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(0, 0, 0, 0.1);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-  }
-  a:hover {
-    color: #6a0080;
-  }
-  button {
-    background: var(--glass-bg);
-    color: #213547;
-  }
-  h1 {
-    background: linear-gradient(45deg, #6a0080, #9c27b0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
 }

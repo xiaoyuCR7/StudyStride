@@ -17,109 +17,118 @@
           </select>
         </div>
       </div>
-      
+
       <!-- 学习时长统计 -->
-      <div class="stats-container">
-        <h2>学习时长统计</h2>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <h3>本周</h3>
-            <p class="stat-value">{{ formatDuration(weekTotalTime) }}</p>
-          </div>
-          <div class="stat-item">
-            <h3>本月</h3>
-            <p class="stat-value">{{ formatDuration(monthTotalTime) }}</p>
-          </div>
-          <div class="stat-item">
-            <h3>总计</h3>
-            <p class="stat-value">{{ formatDuration(totalTotalTime) }}</p>
+      <div class="stats-container-wrapper">
+        <div class="stats-container-glow"></div>
+        <div class="stats-container">
+          <h2>学习时长统计</h2>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <h3>本周</h3>
+              <p class="stat-value">{{ formatDuration(weekTotalTime) }}</p>
+            </div>
+            <div class="stat-item">
+              <h3>本月</h3>
+              <p class="stat-value">{{ formatDuration(monthTotalTime) }}</p>
+            </div>
+            <div class="stat-item">
+              <h3>总计</h3>
+              <p class="stat-value">{{ formatDuration(totalTotalTime) }}</p>
+            </div>
           </div>
         </div>
       </div>
-      
+
       <!-- 学习时长图表 -->
-      <div class="chart-container">
-        <h2>学习时长趋势</h2>
-        <div class="chart-wrapper">
-          <Bar :data="chartData" :options="chartOptions" />
+      <div class="chart-container-wrapper">
+        <div class="chart-container-glow"></div>
+        <div class="chart-container">
+          <h2>学习时长趋势</h2>
+          <div class="chart-wrapper">
+            <Bar :data="chartData" :options="chartOptions" />
+          </div>
         </div>
       </div>
-      
-      <div class="sessions-list">
-        <h2>{{ displayDate }} 的学习记录</h2>
-        <div v-if="filteredSessions.length === 0" class="empty-state">
-          暂无学习记录
-        </div>
-        <div v-else class="session-item" v-for="session in filteredSessions" :key="session.id">
-          <div class="session-header">
-            <div class="session-time">
-              <span v-if="isShowingAll" class="session-date">{{ formatSessionDate(session) }}</span>
-              <span class="start-time">{{ formatTime(session.startTime) }}</span>
-              <span class="duration">{{ formatDuration(session.duration) }}</span>
-            </div>
-            <div class="session-actions">
-              <div class="session-subject">
-                <span class="subject-tag">{{ session.subject || '未分类' }}</span>
+
+      <div class="sessions-list-wrapper">
+        <div class="sessions-list-glow"></div>
+        <div class="sessions-list">
+          <h2>{{ displayDate }} 的学习记录</h2>
+          <div v-if="filteredSessions.length === 0" class="empty-state">
+            暂无学习记录
+          </div>
+          <div v-else class="session-item" v-for="session in filteredSessions" :key="session.id">
+            <div class="session-header">
+              <div class="session-time">
+                <span v-if="isShowingAll" class="session-date">{{ formatSessionDate(session) }}</span>
+                <span class="start-time">{{ formatTime(session.startTime) }}</span>
+                <span class="duration">{{ formatDuration(session.duration) }}</span>
               </div>
-              <button @click="editSession(session)" class="edit-btn">编辑</button>
-              <button @click="showDeleteConfirmModal(session.id)" class="delete-btn">删除</button>
-            </div>
-          </div>
-          <div class="session-content" v-if="session.content">
-            {{ session.content }}
-          </div>
-          <div class="session-content empty" v-else>
-            未记录学习内容
-          </div>
-        </div>
-        
-        <!-- 编辑会话弹窗 -->
-        <div class="modal" v-if="showEditModal">
-          <div class="modal-content">
-            <h3>编辑学习记录</h3>
-            <div class="form-group">
-              <label for="editSubject">科目：</label>
-              <select id="editSubject" v-model="editSessionData.subject">
-                <option v-for="subject in subjects" :key="subject.id" :value="subject.name">
-                  {{ subject.name }}
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="editDuration">时长：</label>
-              <div class="duration-inputs">
-                <input type="number" v-model.number="editHours" min="0" placeholder="小时" />
-                <span class="separator">:</span>
-                <input type="number" v-model.number="editMinutes" min="0" max="59" placeholder="分钟" />
+              <div class="session-actions">
+                <div class="session-subject">
+                  <span class="subject-tag">{{ session.subject || '未分类' }}</span>
+                </div>
+                <button @click="editSession(session)" class="edit-btn">编辑</button>
+                <button @click="showDeleteConfirmModal(session.id)" class="delete-btn">删除</button>
               </div>
             </div>
-            <div class="form-group">
-              <label for="editContent">内容：</label>
-              <textarea id="editContent" v-model="editSessionData.content" placeholder="学习内容..."></textarea>
+            <div class="session-content" v-if="session.content">
+              {{ session.content }}
             </div>
-            <div class="modal-buttons">
-              <button @click="saveEditedSession">保存</button>
-              <button @click="cancelEditSession">取消</button>
+            <div class="session-content empty" v-else>
+              未记录学习内容
             </div>
           </div>
-        </div>
-        
-        <!-- 删除确认弹窗 -->
-        <div class="modal" v-if="showDeleteModal">
-          <div class="modal-content">
-            <h3>确认删除</h3>
-            <p class="modal-message">确定要删除这条学习记录吗？此操作不可恢复。</p>
-            <div class="modal-buttons">
-              <button @click="confirmDeleteSession" class="danger">删除</button>
-              <button @click="cancelDeleteSession">取消</button>
+
+          <!-- 编辑会话弹窗 -->
+          <div class="modal" v-if="showEditModal">
+            <div class="modal-content">
+              <h3>编辑学习记录</h3>
+              <div class="form-group">
+                <label for="editSubject">科目：</label>
+                <select id="editSubject" v-model="editSessionData.subject">
+                  <option v-for="subject in subjects" :key="subject.id" :value="subject.name">
+                    {{ subject.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="editDuration">时长：</label>
+                <div class="duration-inputs">
+                  <input type="number" v-model.number="editHours" min="0" placeholder="小时" />
+                  <span class="separator">:</span>
+                  <input type="number" v-model.number="editMinutes" min="0" max="59" placeholder="分钟" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="editContent">内容：</label>
+                <textarea id="editContent" v-model="editSessionData.content" placeholder="学习内容..."></textarea>
+              </div>
+              <div class="modal-buttons">
+                <button @click="saveEditedSession">保存</button>
+                <button @click="cancelEditSession">取消</button>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <!-- 提示弹窗 -->
-        <div class="modal" v-if="showToast">
-          <div class="modal-content toast">
-            <p class="toast-message">{{ toastMessage }}</p>
+
+          <!-- 删除确认弹窗 -->
+          <div class="modal" v-if="showDeleteModal">
+            <div class="modal-content">
+              <h3>确认删除</h3>
+              <p class="modal-message">确定要删除这条学习记录吗？此操作不可恢复。</p>
+              <div class="modal-buttons">
+                <button @click="confirmDeleteSession" class="danger">删除</button>
+                <button @click="cancelDeleteSession">取消</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 提示弹窗 -->
+          <div class="modal" v-if="showToast">
+            <div class="modal-content toast">
+              <p class="toast-message">{{ toastMessage }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -207,7 +216,7 @@ const weekTotalTime = computed(() => {
   weekStart.setDate(now.getDate() - now.getDay())
   weekStart.setHours(0, 0, 0, 0)
   const weekStartStr = weekStart.toISOString().split('T')[0] as string
-  
+
   return store.sessions
     .filter(session => session.date >= weekStartStr)
     .reduce((total, session) => total + session.duration, 0)
@@ -218,7 +227,7 @@ const monthTotalTime = computed(() => {
   const now = new Date()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
   const monthStartStr = monthStart.toISOString().split('T')[0] as string
-  
+
   return store.sessions
     .filter(session => session.date >= monthStartStr)
     .reduce((total, session) => total + session.duration, 0)
@@ -247,11 +256,11 @@ const getLast7Days = (): string[] => {
 const dailyStudyMinutes = computed(() => {
   const days = getLast7Days()
   const minutesByDate: Record<string, number> = {}
-  
+
   days.forEach(day => {
     minutesByDate[day] = 0
   })
-  
+
   store.sessions.forEach(session => {
     const date = session.date as string
     if (date && days.includes(date)) {
@@ -261,7 +270,7 @@ const dailyStudyMinutes = computed(() => {
       minutesByDate[date] += Math.floor(session.duration / 60)
     }
   })
-  
+
   return days.map(day => minutesByDate[day] || 0)
 })
 
@@ -287,8 +296,8 @@ const chartData = computed(() => ({
     {
       label: '学习时长（分钟）',
       data: dailyStudyMinutes.value,
-      backgroundColor: 'rgba(156, 39, 176, 0.6)',
-      borderColor: 'rgba(156, 39, 176, 1)',
+      backgroundColor: 'rgba(225, 224, 204, 0.45)',
+      borderColor: 'rgba(225, 224, 204, 0.95)',
       borderWidth: 1,
       borderRadius: 8,
       barThickness: 30
@@ -298,10 +307,10 @@ const chartData = computed(() => ({
 
 // 图表配置
 const chartOptions = computed(() => {
-  const textColor = isLightMode.value ? 'rgba(45, 55, 72, 0.8)' : 'rgba(255, 255, 255, 0.8)'
-  const gridColor = isLightMode.value ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.1)'
-  const tickColor = isLightMode.value ? 'rgba(45, 55, 72, 0.6)' : 'rgba(255, 255, 255, 0.7)'
-  
+  const textColor = isLightMode.value ? 'rgba(45, 55, 72, 0.8)' : 'rgba(225, 224, 204, 0.88)'
+  const gridColor = isLightMode.value ? 'rgba(0, 0, 0, 0.05)' : 'rgba(225, 224, 204, 0.08)'
+  const tickColor = isLightMode.value ? 'rgba(45, 55, 72, 0.6)' : 'rgba(225, 224, 204, 0.65)'
+
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -317,9 +326,9 @@ const chartOptions = computed(() => {
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: '#fff',
-        bodyColor: '#fff',
+        backgroundColor: 'rgba(16, 16, 16, 0.92)',
+        titleColor: '#e1e0cc',
+        bodyColor: '#dedbc8',
         padding: 12,
         cornerRadius: 8
       }
@@ -357,17 +366,17 @@ const chartOptions = computed(() => {
 
 const filterSessions = () => {
   let sessions = store.sessions
-  
+
   // 按日期筛选
   if (selectedDate.value) {
     sessions = sessions.filter(session => session.date === selectedDate.value)
   }
-  
+
   // 按科目筛选
   if (selectedSubjectFilter.value) {
     sessions = sessions.filter(session => session.subject === selectedSubjectFilter.value)
   }
-  
+
   filteredSessions.value = sessions
 }
 
@@ -430,23 +439,23 @@ const editSession = (session: any) => {
     content: session.content,
     duration: session.duration
   }
-  
+
   // 转换时长为小时和分钟
   editHours.value = Math.floor(session.duration / 3600)
   editMinutes.value = Math.floor((session.duration % 3600) / 60)
-  
+
   showEditModal.value = true
 }
 
 // 保存编辑后的会话
 const saveEditedSession = async () => {
   const totalSeconds = editHours.value * 3600 + editMinutes.value * 60
-  
+
   if (totalSeconds === 0) {
     showToastMessage('请输入有效的学习时长')
     return
   }
-  
+
   // 找到并更新会话
   const index = store.sessions.findIndex(session => session.id === editSessionData.value.id)
   if (index !== -1) {
@@ -454,7 +463,7 @@ const saveEditedSession = async () => {
     if (session) {
       const endTime = session.endTime ? new Date(session.endTime) : new Date()
       const startTime = new Date(endTime.getTime() - totalSeconds * 1000)
-      
+
       store.sessions[index] = {
         ...session,
         id: session.id,
@@ -465,7 +474,7 @@ const saveEditedSession = async () => {
         endTime: endTime,
         date: (session.date || startTime.toISOString().split('T')[0]) as string
       }
-      
+
       await store.saveSessions()
       filterSessions()
       cancelEditSession()
@@ -491,7 +500,7 @@ const cancelEditSession = () => {
 const showToastMessage = (message: string) => {
   toastMessage.value = message
   showToast.value = true
-  
+
   // 2秒后自动关闭
   setTimeout(() => {
     showToast.value = false
@@ -573,26 +582,66 @@ button:hover {
   opacity: 0.8;
 }
 
+.stats-container-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.stats-container-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  border-radius: 40px;
+  pointer-events: none;
+  filter: blur(45px);
+  background: var(--glow-gradient, linear-gradient(137deg, #9c27b0 0%, #d500f9 45%, #9c27b0 100%));
+}
+
 .stats-container {
-  background: var(--card-bg);
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(var(--card-bg-inner, #1A1A1C), var(--card-bg-inner, #1A1A1C)) padding-box,
+              var(--border-gradient, linear-gradient(137deg, #9c27b0 0%, #d500f9 45%, #9c27b0 100%)) border-box;
+  border: 8px solid transparent;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 16px;
-  margin-bottom: 2rem;
-  border: 1px solid var(--card-border);
+  border-radius: 40px;
   box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.chart-container-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.chart-container-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  border-radius: 40px;
+  pointer-events: none;
+  filter: blur(45px);
+  background: var(--glow-gradient, linear-gradient(137deg, #9c27b0 0%, #d500f9 45%, #9c27b0 100%));
 }
 
 .chart-container {
-  background: var(--card-bg);
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(var(--card-bg-inner, #1A1A1C), var(--card-bg-inner, #1A1A1C)) padding-box,
+              var(--border-gradient, linear-gradient(137deg, #9c27b0 0%, #d500f9 45%, #9c27b0 100%)) border-box;
+  border: 8px solid transparent;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 16px;
-  margin-bottom: 2rem;
-  border: 1px solid var(--card-border);
+  border-radius: 40px;
   box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
 }
 
 .chart-wrapper {
@@ -640,14 +689,34 @@ button:hover {
   background-clip: text;
 }
 
+.sessions-list-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.sessions-list-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  border-radius: 40px;
+  pointer-events: none;
+  filter: blur(45px);
+  background: var(--glow-gradient, linear-gradient(137deg, #9c27b0 0%, #d500f9 45%, #9c27b0 100%));
+}
+
 .sessions-list {
-  background: var(--card-bg);
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(var(--card-bg-inner, #1A1A1C), var(--card-bg-inner, #1A1A1C)) padding-box,
+              var(--border-gradient, linear-gradient(137deg, #9c27b0 0%, #d500f9 45%, #9c27b0 100%)) border-box;
+  border: 8px solid transparent;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 2rem;
-  border-radius: 16px;
-  border: 1px solid var(--card-border);
+  border-radius: 40px;
   box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
 }
 
 h2 {
@@ -956,42 +1025,48 @@ button.danger {
     min-width: 90%;
     padding: 1.5rem;
   }
-  
+
   .duration-inputs {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .duration-inputs input {
     width: 100%;
   }
-  
+
   .duration-inputs .separator {
     display: none;
   }
-  
+
   .modal-buttons {
     flex-direction: column;
   }
-  
+
   .modal-buttons button {
     width: 100%;
   }
-  
+
   .session-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .session-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .session-subject {
     margin-left: 0;
+  }
+
+  .stats-container,
+  .chart-container,
+  .sessions-list {
+    padding: 1.5rem;
   }
 }
 
