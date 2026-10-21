@@ -1,0 +1,15 @@
+site_name: StudyStride Docs
+site_url: https://xiaoyucr7.github.io/StudyStride/docs-site/
+site_description: StudyStride 项目文档站（开源软件实验二 MkDocs + GitHub Actions 自动部署演示）
+
+theme:
+  name: readthedocs
+
+nav:
+  - 首页: index.md
+  - 使用指南: guide.md
+  - 实验二说明: lab2.md
+
+markdown_extensions:
+  - toc
+  - admonition
