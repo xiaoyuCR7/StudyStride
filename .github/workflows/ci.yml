@@ -136,7 +136,7 @@ jobs:
       - name: Build MkDocs docs-site
         run: |
           pip install mkdocs
-          mkdocs build -f docs-site/mkdocs.yml -d dist/docs-site
+          mkdocs build -f docs-site/mkdocs.yml -d "$GITHUB_WORKSPACE/dist/docs-site"  # 相对路径会按 mkdocs.yml 所在目录解析
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
