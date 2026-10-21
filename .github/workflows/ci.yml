@@ -7,6 +7,24 @@ on:
     branches: [ main ]
 
 jobs:
+  # Python 单元测试（实验二任务一新增）
+  python-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    - name: Install dependencies
+      run: |
+        cd python_lab
+        pip install -r requirements.txt
+    - name: Run unit tests
+      run: |
+        cd python_lab
+        pytest -v
+
   # 前端构建测试
   frontend-build:
     runs-on: ubuntu-latest
